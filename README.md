@@ -1,2 +1,2 @@
 # FlowTracker
-A repository for using min-cost flows for tracking
+Using min-cost flows for tracking
