@@ -21,7 +21,7 @@ class Frames(object):
         
         if video != None and dir_path == None:
             cwd = os.getcwd()
-            vot_dir = os.path.join(cwd, '../vot2016/vot2016/')
+            vot_dir = os.path.join(cwd, '../Data/vot2016/vot2016/')
             dir_path = os.path.join(vot_dir, video)
         
         if video == None and dir_path == None:

@@ -13,8 +13,6 @@ def add_edges2pixel(graph, shape_frame, frame_num, x, y, window):
         for j in range(lower , upper+1, 1 ):
             if x + i >= 0 and x + i < shape_frame[0]:
                 if y + j >= 0 and y +j < shape_frame[1]:
-                    #print(frame_num, x+ i , y + j )
-                    #print(pixel2id(shape_frame, frame_num + 1, x + i , y + j))
                     graph.add_edge(graph.vertex(pixel2id(shape_frame, frame_num, x , y)), graph.vertex(pixel2id(shape_frame, frame_num+1, x +i, y + j)))
                 
 
@@ -47,11 +45,11 @@ for v in g.vertices():
 #graph_draw(g)
         
 
-for v in g.vertex(pixel2id(frames.dims,2, 0,0)).out_neighbors():
+for v in g.vertex(pixel2id(frames.dims,2, 1,2)).out_neighbors():
     print(id2pixel(int(v), frames.dims))
     
 eprop = g.new_edge_property("double")
-g.ep.cost = vprop                        # equivalent to g.vertex_properties["foo"] = vprop
+g.ep.cost = eprop                        # equivalent to g.vertex_properties["foo"] = vprop
 v = g.vertex(0)
 
 
