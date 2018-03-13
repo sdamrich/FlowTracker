@@ -9,7 +9,7 @@ def add_edges2pixel(graph, shape_frame, frame_num, x, y, window):
     # window size must be odd
     assert window % 2 == 1
     lower = int( - math.floor(window / 2))
-    upper = int(math.ceil(window / 2))
+    upper = int(math.floor(window / 2))
     for i in range(lower, upper+1, 1 ):
         for j in range(lower , upper+1, 1 ):
             if x + i >= 0 and x + i < shape_frame[0]:
@@ -21,6 +21,8 @@ def add_edges2pixel(graph, shape_frame, frame_num, x, y, window):
 
 def update_costs(g, pred_map, frame_0, frame_l):
     loss = 0
+    hit = 0
+    not_hit = 0
     # iterate over entire frame
     for x in range(len(frame_0)):
         for y in range(len(frame_0[0,:])):
@@ -42,15 +44,23 @@ def update_costs(g, pred_map, frame_0, frame_l):
                 
                 # depedning on whether path lands in BB or not, 
                 # update edge costs on path and loss
+                length =len(path)
                 if np.all(frame_l[v_x, v_y] == 1):
+                    f = 0
+                    hit += 1
                     loss -= 1
                     for e in path:
-                        g.ep.cost[e] -= 1
+                        f += 1
+                        factor= f/length
+                        g.ep.cost[e] -= 2*f/length
                 else:
+                    f=0
+                    not_hit +=1
                     loss +=1
                     for e in path:
-                        g.ep.cost[e] += 1
-    return loss
+                        f +=1
+                        g.ep.cost[e] += 2*f/length
+    return loss, hit, not_hit 
     
     
     
@@ -69,9 +79,10 @@ def learn_costs(g, frame_0, frame_l, iterations):
                     
     
 
-frames = Frames(dir_path= '/media/sebuntu/Daten/Daten/Studium/Semester_13/ML4CV/project/Data/VOT2016_GT/ball1test')
-
-window = 3
+frames = Frames(dir_path= '/media/sebuntu/Daten/Daten/Studium/Semester_13/ML4CV/project/Data/VOT2016_GT/ball1', npy = True)
+print('Number of pixels in source BB :' , np.sum(frames.frames[0]))
+print('Number of pixels in target BB :' , np.sum(frames.frames[frames.n_frames-1]))
+window =5
 
 n_pixels = frames.dims[0]*frames.dims[1] * frames.n_frames
 
@@ -126,7 +137,7 @@ for x in range(frames.dims[0]):
         g.ep.cost[e] = 0
 
 
-learn_costs(g, frames.frames[0], frames.frames[frames.n_frames-1], 30)
+learn_costs(g, frames.frames[0], frames.frames[frames.n_frames-1], 100)
 
 
 

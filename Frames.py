@@ -12,8 +12,9 @@ import matplotlib.pyplot as plt
 
 # Class for videos as frames
 class Frames(object):
-    def __init__(self, dir_path = None, video = None):
+    def __init__(self, dir_path = None, video = None, npy=None):
         
+        self.npy = npy
         # if a directory path is given, this overrides the video
         if video != None and dir_path != None:
             print("'video' must not be used if 'dir_path' is not None")
@@ -37,12 +38,17 @@ class Frames(object):
     def load(self):        
         self.frames = []
         
-        for filename in os.listdir(self.dir_path):
-            if filename.endswith(".png") or filename.endswith('.jpg'): 
-               self.frames.append(plt.imread(self.dir_path+'/'+filename))
-            else:
-                continue
-            
+        if self.npy==None:
+            for filename in os.listdir(self.dir_path):
+                if filename.endswith(".png") or filename.endswith('.jpg'): 
+                    self.frames.append(plt.imread(self.dir_path+'/'+filename))
+                else:
+                    continue
+        else:
+            cropped=np.load(self.dir_path + '/cropped.npy')
+            print(cropped.shape)
+            self.frames= list(cropped)
+                    
         self.dims = self.frames[0].shape
         self.n_frames = len(self.frames)
     
