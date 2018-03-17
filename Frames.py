@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 
 # Class for videos as frames
 class Frames(object):
-    def __init__(self, dir_path = None, video = None, npy=None):
-        
-        self.npy = npy
+    def __init__(self, dir_path = None, video = None, size=None, max_frames = 50):
+        self.max_frames = max_frames
+        self.size = size
         # if a directory path is given, this overrides the video
         if video != None and dir_path != None:
             print("'video' must not be used if 'dir_path' is not None")
@@ -38,17 +38,25 @@ class Frames(object):
     def load(self):        
         self.frames = []
         
-        if self.npy==None:
+        if self.size==None:
+            counter = 0
             for filename in os.listdir(self.dir_path):
-                if filename.endswith(".png") or filename.endswith('.jpg'): 
+                if (filename.endswith(".png") or filename.endswith('.jpg')) and counter < self.max_frames: 
                     self.frames.append(plt.imread(self.dir_path+'/'+filename))
+                    counter += 1
                 else:
                     continue
-        else:
+        elif self.size == 'cropped':
             cropped=np.load(self.dir_path + '/cropped.npy')
-            print(cropped.shape)
             self.frames= list(cropped)
-                    
+        elif self.size == 'small':
+            small=np.load(self.dir_path + '/small.npy')
+            self.frames= list(small)
+        else:
+            print('Not a valid size.')
+        
+        self.frames = np.array(self.frames)
+        self.frames = self.frames[0 : self.max_frames]            
         self.dims = self.frames[0].shape
         self.n_frames = len(self.frames)
     
