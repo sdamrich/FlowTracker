@@ -1,5 +1,6 @@
 \documentclass{article}
 
+\usepackage{mathtools}
 % if you need to pass options to natbib, use, e.g.:
 % \PassOptionsToPackage{numbers, compress}{natbib}
 % before loading nips_2017
@@ -186,10 +187,21 @@ There is also a \verb+\paragraph+ command available, which sets the
 heading in bold, flush left, and inline with the text, with the
 heading followed by 1\,em of space.
 
-\section{Differentiate KKT conditions}
+\section{Differentiate through KKT Conditions}
 \label{others}
 
-These instructions apply to everyone.
+The OptNet Paper introduced a method to differentiate through a quadratic problem given by
+\[ \min_f \frac{1}{2} f^T Q f + c^T f \]
+\[\text{subject to }~  Af-b=0 ~\text{ and }~ Gf \leq h, \]
+
+where $f\in \mathbb{R}^n$ is the optimization variable (in our case the flow), $Q\in \mathbb{R}^{n\times n}$ is a positive semidefinite matrix, $c\in \mathbb{R}^n$, $A\in \mathbb{R}^{m\times n}$, $b\in \mathbb{R}^m$, $G\in \mathbb{R}^{p\times n}$ and $h\in \mathbb{R}^p$ are the data describing the minimization problem. 
+
+Since our first purpose was the application of this process to a minimum-cost flow problem (MCFP) for computing a shortest path through a graph associated to a video, we could restrict ourselves to an linear optimization problem of the following form:
+
+\[\min_f c^T f\] 
+\[ \text{subject to} ~~Af-b=0 ~\text{and}~ f\geq 0,\]
+
+where $f$ is the flow through the video and $c$ is the cost vector related the graph's edges. Together with suitable $A$, $b$ and the inequality $f\geq 0$ this encode the MCFP. 
 
 \subsection{Citations within the text}
 
