@@ -20,6 +20,8 @@
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
+\usepackage{amsmath}
+\usepackage{bbm}
 
 \title{Tracking Objects Time Symmetrically}
 
@@ -99,7 +101,7 @@ Papers that exceed these limits will not be reviewed, or in any
 other way considered for presentation at the conference.
 
 The margins in 2017 are the same as since 2007, which allow for
-$\sim$$15\%$ more words in the paper compared to earlier years.
+$\sim 15\%$ more words in the paper compared to earlier years.
 
 Authors are required to use the NIPS \LaTeX{} style files obtainable
 at the NIPS website as indicated below. Please make sure you use the
@@ -163,6 +165,30 @@ list both author and co-author side by side.
 
 Please pay special attention to the instructions in Section \ref{others}
 regarding figures, tables, acknowledgments, and references.
+
+\section{Tracking as a min-cost-flow problem}
+Out first strategy is to model the movement of the object in the video as a flow which is minimal with respect to some costs.
+\subsection{Min-Cost-Flow programs}
+Given a directed graph $G=(V,E)$ with edge weights $c$, edge capacities $\kappa$ and vertex supply $b$, the min-cost-flow problem (MCFP) is the problem of finding a flow of minimal cost along the edges of the graph, which respects the capacity constraints and manages to match up the vertices with positive and negative flow supply. As a linear program this can be formulated as follows:
+\begin{align}\label{MCFP}
+\min_f &\sum_{e \in E} c(e)\,f(e) \textnormal{ s.t.}\nonumber\\
+\forall v \in V: \,&\sum_{(v,w) \in E} f(v,w) = \sum_{(u,v) \in E} f(u,v) + b(v) \\
+\forall	e \in E: \,&0 \leq f(e) \leq \kappa(e) \nonumber
+\end{align}
+where the first condition ensures that flow is conserved and the supply and demand at each vertex are met while the second condition guarantees the capacity constraints. In the following, we will often write $c, b, \kappa, f$ as vectors of length $| E|$.
+
+\subsection{MCFP for object tracking}
+We construct the directed graph on which we want to compute a min-cost-flow as follows: The vertices are given by the pixels of the video in addition of an auxiliary node $t$, which serves as a sink. There are edges from a pixel to a square area of pixels below it in the next frame (pixel close to the borders of the frame have less outgoing edges). We call the length of the sides of this square window size. It should be an odd number. All the pixels in the last frame have an edge to the sink. The flow supply is one for every pixel in the first frame that belongs to the object. All other pixels have a flow supply of zero apart from $t$, which has a flow demand matching the cumulative flow supply.\\
+The costs and capacities of the the graph are the output of a neural networks, which takes the video as input. \\
+Given a min-cost-flow for the above described graph, we predict the location of the object in every frame by (a bounding box around) the pixels through which there is a positive flow. We can also associate a loss $l$ to a flow. This is done subtracting the the amount of flow that goes through the object in the last frame from the amount of flow that misses the object in the last frame. As a result, we get 
+$$
+\left(\frac{dl}{df}\right)_{(v,w)} = 
+\begin{cases}
+ 1-2\cdot\mathbbm{1}(\textnormal{the pixel to } v \textnormal{ is part of the object}) &\text{if } w = t\\
+ 0 &\text{else}
+\end{cases}
+$$
+In order to train the neural network, we need to know $\frac{dl}{dc}$ and $\frac{dl}{d\kappa}$. Given $\frac{dl}{df}$ as above and using the chain rule, the key is to find $\frac{df}{dc}$ and $\frac{df}{d\kappa}$. In other words, we need to find out how the optimal flow, the solution to the linear program \ref{MCFP}, changes with the problem parameter $c$ and $\kappa$. For this task we explored the ideas of \cite{AmosK17}
 
 \section{Headings: first level}
 \label{headings}
@@ -401,4 +427,6 @@ learning and recall at excitatory recurrent synapses and cholinergic
 modulation in rat hippocampal region CA3. {\it Journal of
   Neuroscience} {\bf 15}(7):5249-5262.
 
+\bibliographystyle{alpha}
+\bibliography{tracking.bib}
 \end{document}
