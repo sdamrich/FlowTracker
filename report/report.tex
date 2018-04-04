@@ -196,12 +196,26 @@ The OptNet Paper introduced a method to differentiate through a quadratic proble
 
 where $f\in \mathbb{R}^n$ is the optimization variable (in our case the flow), $Q\in \mathbb{R}^{n\times n}$ is a positive semidefinite matrix, $c\in \mathbb{R}^n$, $A\in \mathbb{R}^{m\times n}$, $b\in \mathbb{R}^m$, $G\in \mathbb{R}^{p\times n}$ and $h\in \mathbb{R}^p$ are the data describing the minimization problem. 
 
-Since our first purpose was the application of this process to a minimum-cost flow problem (MCFP) for computing a shortest path through a graph associated to a video, we could restrict ourselves to an linear optimization problem of the following form:
+Since our first purpose was the application of this process to a minimum-cost flow problem (MCFP) for computing a shortest path through a graph associated to a video, we could restrict ourselves to a linear optimization problem of the following form:
 
 \[\min_f c^T f\] 
-\[ \text{subject to} ~~Af-b=0 ~\text{and}~ f\geq 0,\]
+\[ \text{subject to} ~~Af=b,~f\geq 0 ~\text{and}~ f \leq \kappa,\]
 
-where $f$ is the flow through the video and $c$ is the cost vector related the graph's edges. Together with suitable $A$, $b$ and the inequality $f\geq 0$ this encode the MCFP. 
+where $f$ is the flow through the video, $c$ is the cost vector and $\kappa$ is the capacity vector related the graph's edges. Together with suitable $A$, $b$ and the inequalities $f\geq 0$, $f\leq \kappa$, this case encodes the MCFP. Now we pursue the OptNet Paper and use the definitions
+\[G\coloneqq \begin{pmatrix} -I \\  I \end{pmatrix} ~~\text{and} ~~ h\coloneqq \begin{pmatrix} 0 \\ \kappa \end{pmatrix} \]
+
+to get the both restrictions $Af=b$ and $Gf\leq h$. Then we obtain the Lagrangian function
+\[L(f, \nu, \lambda) = c^T f + \nu ^T (Af-b) + \lambda^T(Gf-\kappa)\]
+which leads us to the KKT conditions
+
+\begin{align*}
+\nabla_f L(f,\nu, \lambda) = c + A^T \nu^*  + G^T\lambda^* &= 0 \\
+\nabla _\nu L(f, \nu, \lambda) = Af^* - b &= 0 \\
+D(\lambda^*) (\nabla_\lambda L(f, \nu, \lambda)) = D(\lambda^*)(Gf-\kappa) &= 0.
+\end{align*}
+
+
+
 
 \subsection{Citations within the text}
 
