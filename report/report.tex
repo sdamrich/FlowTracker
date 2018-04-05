@@ -212,12 +212,41 @@ to get the both restrictions $Af=b$ and $Gf\leq h$. Then we obtain the Lagrangia
 which leads us to the KKT conditions
 
 \begin{align*}
-\nabla_f L(f,\nu, \lambda) = c + A^T \nu^*  + G^T\lambda^* &= 0 \\
-\nabla _\nu L(f, \nu, \lambda) = Af^* - b &= 0 \\
-D(\lambda^*) (\nabla_\lambda L(f, \nu, \lambda)) = D(\lambda^*)(Gf-\kappa) &= 0.
+\nabla_f L(f^*,\nu^*, \lambda^*) = c + A^T \nu^*  + G^T\lambda^* &= 0 \\
+\nabla _\nu L(f^*, \nu^*, \lambda^*) = Af^* - b &= 0 \\
+D(\lambda^*) (\nabla_\lambda L(f^*, \nu^*, \lambda^*)) = D(\lambda^*)(Gf^*-\kappa) &= 0
 \end{align*}
 
+where D(-) creates a diagonal matrix consisting of the entries of a vector and $f^*$, $\nu^*$ and $\lambda^*$ are the optimal primal and dual variables. After taking the differentials of the KKT conditions we receive 
 
+\begin{align*}
+\mathrm{d}c + \mathrm{d}A^T \nu^* + A^T \mathrm{d}\nu + \mathrm{d}G^T \lambda^* + G^T\mathrm{d}\lambda &= 0 \\
+\mathrm{d} A f^* + A\mathrm{d}f - \mathrm{d}b &=0 \\
+D(Gf^*- h) \mathrm{d}\lambda + D(\lambda^*)(\mathrm{d}Gf^* + G\mathrm{d} f - \mathrm{d}h) &=0.
+\end{align*}
+The following matrix form is equivalent:
+
+\begin{align}
+\begin{pmatrix} 0 & G^T & A^T \\ D(\lambda^*) G & D(Gf^* -h) & 0 \\ A & 0 & 0 \end{pmatrix}
+\begin{pmatrix} \mathrm{d} f \\ \mathrm{d} \lambda \\ \mathrm{d} \nu \end{pmatrix} = 
+\begin{pmatrix} -\mathrm{d}c - \mathrm{d}G^T \lambda^* -\mathrm{d}A^T\nu^* \\ 
+-D(\lambda^*)\mathrm d G f^* + D(\lambda^*)\mathrm d h \\
+-\mathrm d A f^* + \mathrm d b \end{pmatrix} \label{diff equation}
+\end{align}
+where the left hand matrix is from now on defined by $M$.
+In the next step we are interested in the derivation $\frac{\partial \ell}{\partial c}\in \mathbb R ^n$, where $\ell: \mathbb{R}^n \rightarrow \mathbb R,~f\mapsto \ell(f) $ is our loss function. So we want to know how the loss vary with respect to the costs of the graph. Later we also discuss the approach of considering $\frac{\partial \ell}{\partial h}\in \mathbb R^n$, where $h$ carries the information about the capacities $\kappa$. Now we differentiate the equation (\ref*{diff equation}) by $\partial c$ and obtain
+
+\[
+M \begin{pmatrix} \frac{\partial f}{\partial c} \\[4pt] \frac{\partial\lambda}{\partial c} \\[4pt] \frac{\partial \nu}{\partial c} \end{pmatrix}
+= 
+\begin{pmatrix} -I \\ 0 \\ 0 \end{pmatrix}.
+\]
+
+In our case the top left entry of $M$ is the zero matrix in contrast to the positive definite matrix $Q$ in the OptNet paper, why $M$ is not invertible. So we can compute a solution (if it exists), which is of course not unique. With this solution for $\frac{\partial f}{\partial c}$ we can compute 
+
+\[
+\frac{\partial \ell }{\partial c} = \frac{\partial \ell}{\partial f} \frac{\partial f}{\partial c}~.
+\]
 
 
 \subsection{Citations within the text}
