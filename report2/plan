@@ -10,12 +10,12 @@ Related work
 	1. OptNet, where quadratic programs are considered
 	2. Sinkhorn distances
 
-Tracking as min cost flow problem
+Tracking as min cost flow problem check +
 	Structure of Graph
 	Costs produced by NN
 	Flow indicates postion of object
 
-Differentiating through a linear program
+Differentiating through a linear program ..
 	KKT Konditions, adaptation of OptNet approach for linear program
 	Theoretical issues: 
 		matrix that has to be inverted (or at least should have a solution) does not have full rank (since Q is not positive definite and A does not have full row rank), compare Theorem 1 of OptNet
@@ -30,18 +30,28 @@ Differentiating through a linear program
 		---> working with sparse matrices would improve performance. Not yet explored
 		QP Solver from OptNet authors does not work
 
+Special cases of MCFP
+	Using shortest paths +
+		Simplification of the problem to shortest paths (ie no capacities), since there are fast solvers for shortest paths problem
+		Instead of differentiating through linear program, good paths are rewarded, bad ones penalised. Should implement uniform penalties. Also, update along all paths, not just those starting in the BB
+		Issue: Mutual beginning of good and bad path does not get updated since rewards and penalties cancel.
+		Use difference between old and updated costs as loss for NN.
+	Capacities and max flow alg
+		simplifiction by omitting costs, since there are rather fast solvers for max flow problems
+		better to differentiate because flow behave more smoothly with resprect to capacities
+		can use reward / penalties just as for shortest paths
+		or try to differentiate through max flow problem
+			changing capacity on edge with flow less than capacity does not change the flow
+			reducing capacity on edge with flow equa to capacity has derivative one on that edge, but more difficult derviative on other edges
+			increasing capacity on edge (v,w) with flow equal to capacity might have derivative of one, if more flow could reach v and leave w, or derivative of zero, else.
 
-Using shortest paths
-	Simplification of the problem to shortest paths (ie no capacities), since there are fast solvers for shortest paths problem
-	Instead of differentiating through linear program, good paths are rewarded, bad ones penalised. Should implement uniform penalties. Also, update along all paths, not just those starting in the BB
-	Issue: Mutual beginning of good and bad path does not get updated since rewards and penalties cancel.
-	Use difference between old and updated costs as loss for NN.
+
 	
-Implementation:
+Implementation: +
 	for graphs: graph_tool for fast handeling of graphs
 	variant of U-Net (after SUperHuman...) for NN
 
-Datasets
+Datasets 
 	VOT, VOT GT
 	Cropped and shrunk
 	Ball1 
