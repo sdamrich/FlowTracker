@@ -80,91 +80,11 @@
   one paragraph.
 \end{abstract}
 
-\section{Submission of papers to NIPS 2017}
 
-NIPS requires electronic submissions.  The electronic submission site
-is
-\begin{center}
-  \url{https://cmt.research.microsoft.com/NIPS2017/}
-\end{center}
+\section{Introduction}
+In this report, we discuss strategies for tracking an object in a video given the initial position of the object. For training also the final position of the object is available. The main idea of all our approaches is to treat the movement of the object as the flow in a graph that is build from connecting the pixels of one frame of the video with the pixels of the next frame. The pixels through which there is flow shall indicate the position of the object. The flow is computed by a variant of the minimal-cost flow problem (MCFP) whose parameters are the output of a neural network. We follow two main trains of thought. In the first one, we examine ways of differentiating through the optimisation problem of the MCFP. We explain why ideas along the lines of \cite{AmosK17} are not suitable for our problem and introduce approximate workarounds for special cases of the MCFP.\\
+The second train of thought considers a special version of the MCFP, namely an entropy regularised version of optimal transport. Here, we do not try to differentiate through the optimisation problem itself, but differentiate through the steps of Sinkhorn's algorithm which solves the entropy regularised optimal transport problem.
 
-Please read carefully the instructions below and follow them
-faithfully.
-
-\subsection{Style}
-
-Papers to be submitted to NIPS 2017 must be prepared according to the
-instructions presented here. Papers may only be up to eight pages
-long, including figures. This does not include acknowledgments and 
-cited references which are allowed on subsequent pages.
-Papers that exceed these limits will not be reviewed, or in any
-other way considered for presentation at the conference.
-
-The margins in 2017 are the same as since 2007, which allow for
-$\sim 15\%$ more words in the paper compared to earlier years.
-
-Authors are required to use the NIPS \LaTeX{} style files obtainable
-at the NIPS website as indicated below. Please make sure you use the
-current files and not previous versions. Tweaking the style files may
-be grounds for rejection.
-
-\subsection{Retrieval of style files}
-
-The style files for NIPS and other conference information are
-available on the World Wide Web at
-\begin{center}
-  \url{http://www.nips.cc/}
-\end{center}
-The file \verb+nips_2017.pdf+ contains these instructions and
-illustrates the various formatting requirements your NIPS paper must
-satisfy.
-
-The only supported style file for NIPS 2017 is \verb+nips_2017.sty+,
-rewritten for \LaTeXe{}.  \textbf{Previous style files for \LaTeX{}
-  2.09, Microsoft Word, and RTF are no longer supported!}
-
-The new \LaTeX{} style file contains two optional arguments:
-\verb+final+, which creates a camera-ready copy, and \verb+nonatbib+,
-which will not load the \verb+natbib+ package for you in case of
-package clash.
-
-At submission time, please omit the \verb+final+ option. This will
-anonymize your submission and add line numbers to aid review.  Please
-do \emph{not} refer to these line numbers in your paper as they will
-be removed during generation of camera-ready copies.
-
-The file \verb+nips_2017.tex+ may be used as a ``shell'' for writing
-your paper. All you have to do is replace the author, title, abstract,
-and text of the paper with your own.
-
-The formatting instructions contained in these style files are
-summarized in Sections \ref{gen_inst}, \ref{headings}, and
-\ref{others} below.
-
-\section{General formatting instructions}
-\label{gen_inst}
-
-The text must be confined within a rectangle 5.5~inches (33~picas)
-wide and 9~inches (54~picas) long. The left margin is 1.5~inch
-(9~picas).  Use 10~point type with a vertical spacing (leading) of
-11~points.  Times New Roman is the preferred typeface throughout, and
-will be selected for you by default.  Paragraphs are separated by
-\nicefrac{1}{2}~line space (5.5 points), with no indentation.
-
-The paper title should be 17~point, initial caps/lower case, bold,
-centered between two horizontal rules. The top rule should be 4~points
-thick and the bottom rule should be 1~point thick. Allow
-\nicefrac{1}{4}~inch space above and below the title to rules. All
-pages should start at 1~inch (6~picas) from the top of the page.
-
-For the final version, authors' names are set in boldface, and each
-name is centered above the corresponding address. The lead author's
-name is to be listed first (left-most), and the co-authors' names (if
-different address) are set to follow. If there is only one co-author,
-list both author and co-author side by side.
-
-Please pay special attention to the instructions in Section \ref{others}
-regarding figures, tables, acknowledgments, and references.
 
 \section{Tracking as a min-cost-flow problem}
 Out first strategy is to model the movement of the object in the video as a flow which is minimal with respect to some costs.
@@ -177,19 +97,18 @@ Given a directed graph $G=(V,E)$ with edge weights $c$, edge capacities $\kappa$
 \end{align}
 where the first condition ensures that flow is conserved and the supply and demand at each vertex are met while the second condition guarantees the capacity constraints. In the following, we will often write $c, b, \kappa, f$ as vectors of length $| E|$.
 
-\subsection{MCFP for object tracking}
+\subsection{MCFP for object tracking}\label{MCFP for tracking}
 We construct the directed graph on which we want to compute a min-cost-flow as follows: The vertices are given by the pixels of the video in addition of an auxiliary node $t$, which serves as a sink. There are edges from a pixel to a square area of pixels below it in the next frame (pixel close to the borders of the frame have less outgoing edges). We call the length of the sides of this square window size. It should be an odd number. All the pixels in the last frame have an edge to the sink. The flow supply is one for every pixel in the first frame that belongs to the object. All other pixels have a flow supply of zero apart from $t$, which has a flow demand matching the cumulative flow supply.\\
 The costs and capacities of the the graph are the output of a neural networks, which takes the video as input. \\
-Given a min-cost-flow for the above described graph, we predict the location of the object in every frame by (a bounding box around) the pixels through which there is a positive flow. We can also associate a loss $l$ to a flow. This is done subtracting the the amount of flow that goes through the object in the last frame from the amount of flow that misses the object in the last frame. As a result, we get 
-$$
+Given a min-cost-flow for the above described graph, we predict the location of the object in every frame by (a bounding box around) the pixels through which there is a positive flow. We can also associate a loss $l$ to a flow. This is done subtracting the the amount of flow that goes through the object in the last frame from the amount of flow that misses the object in the last frame. As a result, we could capture the change of the loss by the flow by the gradient:
+\begin{align}\label{loss}
 \left(\frac{dl}{df}\right)_{(v,w)} = 
 \begin{cases}
  1-2\cdot\mathbbm{1}(\textnormal{the pixel to } v \textnormal{ is part of the object}) &\text{if } w = t\\
  0 &\text{else}
 \end{cases}
-$$
+\end{align}
 In order to train the neural network, we need to know $\frac{dl}{dc}$ and $\frac{dl}{d\kappa}$. Given $\frac{dl}{df}$ as above and using the chain rule, the key is to find $\frac{df}{dc}$ and $\frac{df}{d\kappa}$. In other words, we need to find out how the optimal flow, the solution to the linear program \ref{MCFP}, changes with the problem parameter $c$ and $\kappa$. For this task we explored the ideas of \cite{AmosK17}
-
 
 
 \section{Special cases of the MCFP}
@@ -205,249 +124,39 @@ The shortest paths algorithm gives the shortest paths from the background of the
 One issue with this way of updating costs is that if a path that is penalised and one that is rewarded have a common end (they start in the object and the background respectively, but merge at some point), the rewards and penalties on the common end cancel. The possibility of the merging of paths itself could be an issue. If an edge has very small cost, it might induce several paths to use this edge and hence to merge. Without upper bounds on the capacities there is no possibility for two paths to separate once they have merged. So we might fear that  many paths merge at some point and that as a result the last frame is only passed at very few pixels by the paths coming from the object. This would yield degenerated predictions of the objects location which only consist of a few pixels. Fortunately, this does not seem to be an issue, as we will see in section REF, where we discuss the implementation of this algorithm. We suspect that using a convolutional networks saves us.
 
 
+MAYBE MENTION THE JUMPY BEHAVIOUR OF SHORTEST PATHS AND THE NON CONVERGENCE WITH A POINTER TO THE EXPERIMENTAL RESULTS
+FOREGROUND BACKGROUND
+
+
+\subsection{Maximum Flow}
+The other extreme case of a MCFP would be to focus entirely on the capacities rather than the costs. By setting the costs to zero for all edges, the cost-minimisation problem becomes ill-defined. In order to dodge this problem, one could replace the cost-minimisation problem with a flow maximisation problem. Instead of defining a fixed flow supply for the nodes in the first frame and the sink, one could allow the pixels that constitute the object in the first frame to send as much flow as possible and the sink to take in as much flow as possible. For all other pixels flow-in equals flow-out still applies. The resulting linear program would look like this 
+\begin{align}\label{MFP}
+\max_f &\sum_{(v,t) \in E} f(v,t) \textnormal{ s.t.}\nonumber\\
+\forall v \in V\setminus\left(V' \cup \{ t\}\right) \, & \sum_{(v,w) \in E} f(v,w) = \sum_{(u,v) \in E} f(u,v) \\
+\forall	e \in E: \, & 0 \leq f(e) \leq \kappa(e) \nonumber
+\end{align} 
+where $V'$ are the pixels in the first frame that constitute the object. One advantage of such a simplification of the MCFP is that there are several fast algorithms for solving a maximum flow problem, for instance the Ford-Fulkerson (or Eddmund-Karp) algorithm or the Pre-Flow-Push algorithm. So as above, one could let a neural network predict capacities given the video, then find a maximum flow through the resulting network and finally update the capacities in a meaningful way to provide an update direction for the neural network. Similar to the case of shortest paths, one way to update the capacities is to increase the capacities along a path of positive flow to the object in the last frame and to decrease the capacities (bearing in mind the lower bound of zero capacity) along a path of positive flow to a background pixel in the last frame. A theoretical appeal of this strategy is that it nicely matches up with the notion of augmenting paths that are used to determine a maximum flow is determined with the Ford-Fulkerson algorithm.\\
+Another advantage of using capacities rather than costs is that maximum flow behaves more continuously and piecewise even differentiably with regard to the capacities. That is to say that among the set of maximal flows there are some that change piecewise differentiably with respect to the capacities:  Changing the capacity of an edge on which the flow is not maximal infinitesimally, does not change the flow at all. Decreasing the capacity of an edge on which the flow is maximal, reduces the flow on that edge with a derivative of one. Increasing the capacity on such an edge either increases the flow on that edge with derivative one (if the network allows more flow to enter and leave the edge) or it does not change the flow on that edge at all. The effect on other edges can be manifold, due to the non uniqueness of a maximal flow on some networks, however there always are maximal flows that change piecewise differentiably on all edges with respect to the edges. One could try to use this somewhat smooth behaviour to return a crude approximation to a derivative $\frac{dl}{dc}$ to the neural network. For that we use the loss from section \ref{MCFP for tracking}, normalise it by the size of the flow and pretend that changing the capacity of an edge with maximal flow always results in a derivative of one: 
+\begin{align*}
+\left(\frac{dl}{dc}\right)_{(v,w)} = 
+\begin{cases}
+\frac{1 - 2 \cdot \mathbbm{1}(w\textnormal{ is part of the object})}{\sum_{(u,t)} f(u,t)} &\textnormal{if } w \textnormal{ is in last frame and } f(v,w) = c(v,w)\\
+0 &\textnormal{else}
+\end{cases}
+\end{align*}
+However, this would only propagate information regarding the capacities of the last frame and it is unclear to us whether this is much better than omitting a maximum flow computation altogether and instead updating the capacities of edges leading towards the last frame depending on whether they lead to the object or not. This latter approach however seems to resemble more an object detection scheme than an object tracking one and is not time-symmetric.
+
+MIGHT SOLVE SIZEchange PROBLEM
+
 \section{Implementation}
 We have implemented the shortest paths approach.\footnote{\url{https://github.com/sdamrich/FlowTracker}}  For the neural network we drew inspiration from the architecture of \cite{Lee17}. The network is a convolutional network with a shallow U-form. A ReLu layer follows each convolutional layer. As described in \cite{Lee17}, at first two 2D convolutions are applied. We use a kernel size equal to the window size of the graph. The 2D convolutions increase the channel number from 3 over 5 to 10. Padding is used to keep the original dimensions. The result is recorded, let us call it $X$ and a copy is 2D max pooled to decrease the dimensions of the frames by a factor of 2. Then, video is 3D convoluted to introduce that depend on the time structure of the video. The 3D convolutions keep the channel number constants.  First, we use a kernel of dimensions (3, window size, window size). So, the convolution sees a square area of length window size in three consecutive frames. It should be noted, that this corresponds to information being convoluted that comes from an area of side length twice the window size as we have pooled before. We apply padding to keep the dimensions. Afterwards, we use a kernel of dimensions (2, window size, window size) with padding to keep the latter two dimensions. As a result, we reduce the time dimension by one. Then we upsample trilinearly keeping the time dimension but restoring width and height of the frames to the original values, let us call the result $Y$. Before adding the 2D information $X$ and the 3D information $Y$, we convolute $X$ in the time dimension with a kernel of size 2 to match up dimensions. 
-In the last step, we apply a 2D convolution layer with a kernel of window size, which gives out $\textnormal{window size}^2$ many channels. Here we do not apply a ReLu layer. We interpret the channels of the output as the costs for edges going out of a pixel. The code for this can be found in the NN.py file.\\
+In the last step, we apply a 2D convolution layer with a kernel of window size, which gives out $\textnormal{window size}^2$ many channels. Here we do not apply a ReLu layer. We interpret the channels of the output as the costs for edges going out of a pixel. The code for this can be found in the NN.py file.\\ 
+
+MSE LOSS!
 \\
 The graph is built explicitly using the 
 graph\_tool package. Since we build a large graph, we chose this performant package. \footnote{\url{https://graph-tool.skewed.de/performance}}
 
-\section{Headings: first level}
-\label{headings}
-
-All headings should be lower case (except for first word and proper
-nouns), flush left, and bold.
-
-First-level headings should be in 12-point type.
-
-\subsection{Headings: second level}
-
-Second-level headings should be in 10-point type.
-
-\subsubsection{Headings: third level}
-
-Third-level headings should be in 10-point type.
-
-\paragraph{Paragraphs}
-
-There is also a \verb+\paragraph+ command available, which sets the
-heading in bold, flush left, and inline with the text, with the
-heading followed by 1\,em of space.
-
-\section{Differentiate KKT conditions}
-\label{others}
-
-These instructions apply to everyone.
-
-\subsection{Citations within the text}
-
-The \verb+natbib+ package will be loaded for you by default.
-Citations may be author/year or numeric, as long as you maintain
-internal consistency.  As to the format of the references themselves,
-any style is acceptable as long as it is used consistently.
-
-The documentation for \verb+natbib+ may be found at
-\begin{center}
-  \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-\end{center}
-Of note is the command \verb+\citet+, which produces citations
-appropriate for use in inline text.  For example,
-\begin{verbatim}
-   \citet{hasselmo} investigated\dots
-\end{verbatim}
-produces
-\begin{quote}
-  Hasselmo, et al.\ (1995) investigated\dots
-\end{quote}
-
-If you wish to load the \verb+natbib+ package with options, you may
-add the following before loading the \verb+nips_2017+ package:
-\begin{verbatim}
-   \PassOptionsToPackage{options}{natbib}
-\end{verbatim}
-
-If \verb+natbib+ clashes with another package you load, you can add
-the optional argument \verb+nonatbib+ when loading the style file:
-\begin{verbatim}
-   \usepackage[nonatbib]{nips_2017}
-\end{verbatim}
-
-As submission is double blind, refer to your own published work in the
-third person. That is, use ``In the previous work of Jones et
-al.\ [4],'' not ``In our previous work [4].'' If you cite your other
-papers that are not widely available (e.g., a journal paper under
-review), use anonymous author names in the citation, e.g., an author
-of the form ``A.\ Anonymous.''
-
-\subsection{Footnotes}
-
-Footnotes should be used sparingly.  If you do require a footnote,
-indicate footnotes with a number\footnote{Sample of the first
-  footnote.} in the text. Place the footnotes at the bottom of the
-page on which they appear.  Precede the footnote with a horizontal
-rule of 2~inches (12~picas).
-
-Note that footnotes are properly typeset \emph{after} punctuation
-marks.\footnote{As in this example.}
-
-\subsection{Figures}
-
-All artwork must be neat, clean, and legible. Lines should be dark
-enough for purposes of reproduction. The figure number and caption
-always appear after the figure. Place one line space before the figure
-caption and one line space after the figure. The figure caption should
-be lower case (except for first word and proper nouns); figures are
-numbered consecutively.
-
-You may use color figures.  However, it is best for the figure
-captions and the paper body to be legible if the paper is printed in
-either black/white or in color.
-\begin{figure}[h]
-  \centering
-  \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-  \caption{Sample figure caption.}
-\end{figure}
-
-\subsection{Tables}
-
-All tables must be centered, neat, clean and legible.  The table
-number and title always appear before the table.  See
-Table~\ref{sample-table}.
-
-Place one line space before the table title, one line space after the
-table title, and one line space after the table. The table title must
-be lower case (except for first word and proper nouns); tables are
-numbered consecutively.
-
-Note that publication-quality tables \emph{do not contain vertical
-  rules.} We strongly suggest the use of the \verb+booktabs+ package,
-which allows for typesetting high-quality, professional tables:
-\begin{center}
-  \url{https://www.ctan.org/pkg/booktabs}
-\end{center}
-This package was used to typeset Table~\ref{sample-table}.
-
-\begin{table}[t]
-  \caption{Sample table title}
-  \label{sample-table}
-  \centering
-  \begin{tabular}{lll}
-    \toprule
-    \multicolumn{2}{c}{Part}                   \\
-    \cmidrule{1-2}
-    Name     & Description     & Size ($\mu$m) \\
-    \midrule
-    Dendrite & Input terminal  & $\sim$100     \\
-    Axon     & Output terminal & $\sim$10      \\
-    Soma     & Cell body       & up to $10^6$  \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\section{Final instructions}
-
-Do not change any aspects of the formatting parameters in the style
-files.  In particular, do not modify the width or length of the
-rectangle the text should fit into, and do not change font sizes
-(except perhaps in the \textbf{References} section; see below). Please
-note that pages should be numbered.
-
-\section{Preparing PDF files}
-
-Please prepare submission files with paper size ``US Letter,'' and
-not, for example, ``A4.''
-
-Fonts were the main cause of problems in the past years. Your PDF file
-must only contain Type 1 or Embedded TrueType fonts. Here are a few
-instructions to achieve this.
-
-\begin{itemize}
-
-\item You should directly generate PDF files using \verb+pdflatex+.
-
-\item You can check which fonts a PDF files uses.  In Acrobat Reader,
-  select the menu Files$>$Document Properties$>$Fonts and select Show
-  All Fonts. You can also use the program \verb+pdffonts+ which comes
-  with \verb+xpdf+ and is available out-of-the-box on most Linux
-  machines.
-
-\item The IEEE has recommendations for generating PDF files whose
-  fonts are also acceptable for NIPS. Please see
-  \url{http://www.emfield.org/icuwb2010/downloads/IEEE-PDF-SpecV32.pdf}
-
-\item \verb+xfig+ "patterned" shapes are implemented with bitmap
-  fonts.  Use "solid" shapes instead.
-
-\item The \verb+\bbold+ package almost always uses bitmap fonts.  You
-  should use the equivalent AMS Fonts:
-\begin{verbatim}
-   \usepackage{amsfonts}
-\end{verbatim}
-followed by, e.g., \verb+\mathbb{R}+, \verb+\mathbb{N}+, or
-\verb+\mathbb{C}+ for $\mathbb{R}$, $\mathbb{N}$ or $\mathbb{C}$.  You
-can also use the following workaround for reals, natural and complex:
-\begin{verbatim}
-   \newcommand{\RR}{I\!\!R} %real numbers
-   \newcommand{\Nat}{I\!\!N} %natural numbers
-   \newcommand{\CC}{I\!\!\!\!C} %complex numbers
-\end{verbatim}
-Note that \verb+amsfonts+ is automatically loaded by the
-\verb+amssymb+ package.
-
-\end{itemize}
-
-If your file contains type 3 fonts or non embedded TrueType fonts, we
-will ask you to fix it.
-
-\subsection{Margins in \LaTeX{}}
-
-Most of the margin problems come from figures positioned by hand using
-\verb+\special+ or other commands. We suggest using the command
-\verb+\includegraphics+ from the \verb+graphicx+ package. Always
-specify the figure width as a multiple of the line width as in the
-example below:
-\begin{verbatim}
-   \usepackage[pdftex]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]{myfile.pdf}
-\end{verbatim}
-See Section 4.4 in the graphics bundle documentation
-(\url{http://mirrors.ctan.org/macros/latex/required/graphics/grfguide.pdf})
-
-A number of width problems arise when \LaTeX{} cannot properly
-hyphenate a line. Please give LaTeX hyphenation hints using the
-\verb+\-+ command when necessary.
-
-\subsubsection*{Acknowledgments}
-
-Use unnumbered third level headings for the acknowledgments. All
-acknowledgments go at the end of the paper. Do not include
-acknowledgments in the anonymized submission, only in the final paper.
-
-\section*{References}
-
-References follow the acknowledgments. Use unnumbered first-level
-heading for the references. Any choice of citation style is acceptable
-as long as you are consistent. It is permissible to reduce the font
-size to \verb+small+ (9 point) when listing the references. {\bf
-  Remember that you can go over 8 pages as long as the subsequent ones contain
-  \emph{only} cited references.}
-\medskip
-
-\small
-
-[1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms
-for connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky and
-T.K.\ Leen (eds.), {\it Advances in Neural Information Processing
-  Systems 7}, pp.\ 609--616. Cambridge, MA: MIT Press.
-
-[2] Bower, J.M.\ \& Beeman, D.\ (1995) {\it The Book of GENESIS:
-  Exploring Realistic Neural Models with the GEneral NEural SImulation
-  System.}  New York: TELOS/Springer--Verlag.
-
-[3] Hasselmo, M.E., Schnell, E.\ \& Barkai, E.\ (1995) Dynamics of
-learning and recall at excitatory recurrent synapses and cholinergic
-modulation in rat hippocampal region CA3. {\it Journal of
-  Neuroscience} {\bf 15}(7):5249-5262.
 
 \bibliographystyle{alpha}
 \bibliography{tracking.bib}

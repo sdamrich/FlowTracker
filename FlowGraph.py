@@ -127,6 +127,27 @@ class FlowGraph(object):
                     # obatin coodinates to pixel on last frame
                     _, v_x, v_y = id2pixel(int(v), self.shape_frame)
                     yield path, v_x, v_y
+                    
+    # generator for paths from boundingbox to sink
+    def all_paths_generator(self):
+        # iterate over entire frame
+        for x in range(len(mask_f)):
+            for y in range(len(mask_f[0,:])):
+                # vertex that iterates along the path
+                v = self.g.vertex(pixel2id(self.shape_frame, 0, x,y))
+
+                # while we have not reached the first node (t), go to 
+                # predecessor and remember the edges we passed
+                path = []
+                while self.pred_map[v] != self.num_real_pixels-1:
+                    path.append(self.g.edge(self.pred_map[v], v))
+                    v = self.pred_map[v]
+                
+                # obatin coodinates to pixel on last frame
+                _, v_x, v_y = id2pixel(int(v), self.shape_frame)
+                yield path, v_x, v_y
+                                       
+    
     
     # computes a prediction of where the object is in the last frame
     # by the last nodes of the flow
@@ -154,21 +175,63 @@ class FlowGraph(object):
     # updates the costs
     def update_costs(self, mask_f, mask_l):
         paths = self.path_generator(mask_f)
+        # paths = self.all_paths_generator()
         for path, v_x, v_y in paths:  
-            # depending on whether path lands in BB or not, 
-            # update edge costs on path and loss
-            length =len(path)
-            if np.all(mask_l[v_x, v_y] == 1):
-                f = 0 # distance from 
-                for e in path:
-                    f += 1  # increase factor with which we update the costs of an edge
-                    self.g.ep.cost[e] -= 2*f/length
-            else:
-                f=0
-                for e in path:
-                    f +=1
-                    self.g.ep.cost[e] += 2*f/length
-
+            # obtain x,y value for first pixel on path
+            _, p_x, p_y = id2pixel(int(path[0].source()), self.shape_frame)
+            # if path started in object
+            if np.all(mask_f[p_x,p_y] == 1):
+                # depending on whether path lands in BB or not, 
+                # update edge costs on path and loss
+                length =len(path)
+                if np.all(mask_l[v_x, v_y] == 1):
+                    f = 0 # distance from last frame
+                    for e in path:
+                        """
+                        # update with scaled factor
+                        f += 1  # increase factor with which we update the costs of an edge
+                        self.g.ep.cost[e] -= 2*f/length
+                        """
+                        # udated with constant factor
+                        self.g.ep.cost[e] -= 1
+                else:
+                    f=0
+                    for e in path:
+                        """
+                        # update with scaled factor
+                        f +=1
+                        self.g.ep.cost[e] += 2*f/length
+                        """
+                        # update with constant factor
+                        self.g.ep.cost[e] += 1
+                        
+            # if path started outside object
+            elif np.all(mask_f[p_x, p_y] == 0):
+                # depending on whether path lands in BB or not, 
+                # update edge costs on path and loss
+                length =len(path)
+                if np.all(mask_l[v_x, v_y] == 0):
+                    f = 0 # distance from last frame
+                    for e in path:
+                        """
+                        # update with scaled factor
+                        f += 1  # increase factor with which we update the costs of an edge
+                        self.g.ep.cost[e] += 2*f/length
+                        """
+                        # udated with constant factor
+                        self.g.ep.cost[e] += 1
+                else:
+                    f=0
+                    for e in path:
+                        """
+                        # update with scaled factor
+                        f +=1
+                        self.g.ep.cost[e] -= 2*f/length
+                        """
+                        # update with constant factor
+                        self.g.ep.cost[e] -= 1
+            else: print('Weird Ground Truth, should be 0 or 1.')
+                        
     
     
                     

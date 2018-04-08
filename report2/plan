@@ -36,7 +36,7 @@ Special cases of MCFP
 		Instead of differentiating through linear program, good paths are rewarded, bad ones penalised. Should implement uniform penalties. Also, update along all paths, not just those starting in the BB
 		Issue: Mutual beginning of good and bad path does not get updated since rewards and penalties cancel.
 		Use difference between old and updated costs as loss for NN.
-	Capacities and max flow alg
+	Capacities and max flow alg +
 		simplifiction by omitting costs, since there are rather fast solvers for max flow problems
 		better to differentiate because flow behave more smoothly with resprect to capacities
 		can use reward / penalties just as for shortest paths
@@ -56,5 +56,23 @@ Datasets
 	Cropped and shrunk
 	Ball1 
 	Processor
+
+Experiments
+	pictures given parameter settings 
+	variate window size [3, 5, 9, 11] , iterations [10, 20, 50, 200]
+	obtain orignial picures for comparison
+	state that there is not overlap at all
+
+Optimal transport:
+	transport problem as variant of MCFP
+	first distance approach EMD and Cuturi with entropy regularisation
+	then with undefined interemediate distr
+		just iterate and hope for convergence
+		equivalent problem setting
+	
+
+	
+
+
 
 
