@@ -149,4 +149,15 @@ The feasable set of a linear program is a polyhedron, why the function $f:\mathb
 It should also be refered to the fact that $f$ itself is not a map in general. Since $f$ is a solution of a linear program there might be of course more possible outcomes. However, in practice $f$ is considered as the flow through a video's graph, so there should occur no huge differences or extended errors by ignoring this because all solutions are "close" together. 
 
 
+
+\subsection{Practical issues}
+
+The main practical issue is the huge size of the problem. While the OptNet paper states that more than 1000 parameters are infeasable, we also had realized that without shrunking and cropping the original videos there is no possibility for a acceptable computation time. To be precise, the matrix $A$ has shape 
+\[ \big(\text{number of pixels in the video, number of edges of the graph}\big)\]
+
+where the number of edges in the graph corresponds to $(\text{window size})^2 * \text{width} * \text{height} * \text{number of frames in the video}$. This was a way too much for our computational capabilities, even if we used an extremely shrunk video. 
+Maybe working with sparse matrices could improve the performance, but we have not explored it yet. 
+
+Additionally the QP Solver from the OptNet authors did not work, so we were not able to compare their performance and computational results with ours. It also could be possible, that their QP Solver is not even capable of solving out problem without adding a positive definite matrix $Q$. 
+
 \end{document}
