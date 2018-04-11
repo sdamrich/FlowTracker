@@ -22,6 +22,9 @@
 \usepackage{microtype}      % microtypography
 \usepackage{amsmath}
 \usepackage{bbm}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{verbatim}
 
 \title{Tracking Objects Time Symmetrically}
 
@@ -115,7 +118,7 @@ In order to train the neural network, we need to know $\frac{dl}{dc}$ and $\frac
 We saw in the above section, that the approach of \cite{AmosK17} seems not well suited for our problem. However, to train the neural network, we need to provide the network with some update direction for its output. Instead of differentiating through the optimisation problem to obtain a gradient, we use a solver to solve the version of the MCFP problem and then update the parameters of the problem in a way that reduces the loss at least heuristically at the solution. Then we updated parameters as targets for the neural network. In our analysis, we specialised the general MCFP to two corner cases. This reduces the computation time and highlights different features of costs and capacities. The general MCFP could also be treated in a similar way.
 
 
-\subsection{Shortest Paths}
+\subsection{Shortest Paths}\label{shortestPaths}
 We explored the situation without upper capacity constraints in some detail. In our MCFP the pixel belonging to the object in the first frame all have a flow supply of one and the sink takes in all this flow. Therefore, without upper bounds on the capacities, our MCFP becomes the problem of finding the shortest paths from the pixels that constitute the object in the first frame to the sink. One advantage of this approach is that there a fast solvers for Shortest Paths problems, such as the Dijkstra (if all costs are non-negative) or the Bellman-Ford algorithm.
 \footnote{Due to the special directed structure of our graph, finding shortest paths }
 
@@ -157,6 +160,171 @@ MSE LOSS!
 The graph is built explicitly using the 
 graph\_tool package. Since we build a large graph, we chose this performant package. \footnote{\url{https://graph-tool.skewed.de/performance}}
 
+
+\section{Experiments}
+\subsection{Datasets etc}
+\subsection{Results}
+
+\begin{figure}
+\label{results}
+    \centering
+    
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering    
+        \includegraphics[width=\textwidth]{../results/GT0.png}
+        \caption{GT first frame}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../results/GTl.png}
+        \caption{GT last frame}
+    \end{subfigure}%
+
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w3_iter10.png}
+        \caption{w = 3, iter = 10}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w3_iter50.png}
+        \caption{w = 3, iter = 50}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w3_iter200.png}
+        \caption{w = 3, iter = 200}
+    \end{subfigure}
+   
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w5_iter10.png}
+        \caption{w = 5, iter = 10}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w5_iter50.png}
+        \caption{w = 5, iter = 50}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w5_iter200.png}
+        \caption{w = 5, iter = 200}
+    \end{subfigure}
+
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w9_iter10.png}
+        \caption{w = 9, iter = 10}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w9_iter50.png}
+        \caption{w = 9, iter = 50}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w9_iter200.png}
+        \caption{w = 9, iter = 200}
+    \end{subfigure}
+
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w13_iter10.png}
+        \caption{w = 13, iter = 10}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w13_iter50.png}
+        \caption{w = 13, iter = 50}
+    \end{subfigure}    
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w13_iter200.png}
+        \caption{w = 13, iter = 200}
+    \end{subfigure}
+    
+    \caption{Ground truth and predictions for $w \in \{3,5,9,13\}$ and $\textnormal{iter} \in \{10, 50, 200\}$}
+
+\end{figure}
+\begin{figure}
+\centering
+
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering    
+        \includegraphics[width=\textwidth]{../results/Pred_w5_iter200_bad.png}
+    \end{subfigure}
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering    
+        \includegraphics[width=\textwidth]{../results/Pred_w5_iter200_ok.png}
+    \end{subfigure}
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering    
+        \includegraphics[width=\textwidth]{../results/Pred_w5_iter200.png}
+    \end{subfigure}
+    
+    \caption{Predictions of three different trainings with window size 5 and 200 training iterations.}
+    
+\end{figure}
+
+\begin{table}[b]
+  \caption{Overlap of prediction and ground truth}
+  \label{overlap}
+  \centering
+  \begin{tabular}{llllll}
+    \toprule
+			    & &Iterations &&\\
+                &    & 10    & 50    & 200 \\
+    \midrule
+    Window size & 3  & 0.227 & 0.302 & 0.411 \\
+                & 5  & 0.094 & 0.110 & 0.075 \\
+                & 9  & 0.000 & 0.000 & 0.000 \\
+                & 13 & 0.000 & 0.000 & 0.000 \\
+     \bottomrule
+  \end{tabular}
+\end{table}
+
+We have tested the algorithm for window sizes 3, 5, 9 and 13 and training iterations for the network of 10, 50 and 200 on the first 5 frames of the cropped and shrunk video "ball1". The resulting predictions are shown in figure \ref{results}. The ball moves upwards between the first and last frame. The main result is that the algorithm tends to preserve the shape of the ball, but does not follow its movement, even though it was trained and tested on the same video. Therefore, we refrained from scaling up our experiments to several training and test videos.\\
+
+The ball moves approximately 10 pixels upwards from the first to the fifth and last frame. With a window size of 3 the ball can move up a total of 4 pixels in the four frame transitions between the five frames. So we cannot expect it to reach the correct position in the last frame. With a window size of 9 and 13 however, there should be enough freedom that the ground truth could theoretically be reached. \\
+
+As pointed out in section REF since we only update the costs of some paths and paths whose cost has been reduced might attract other paths to merge with them, one might expect the predictions to degenerate to a few points in the last frame, when most paths have merged.
+We see that the anticipated over-merging problem from section \ref{shortestPaths} does not appear. The predictions in the last frame, though misplaced are rather dense and of the correct shape. We believe that this is because we use a convolutional network for computing the costs. When the network is told that some cost should be changed, it has to update its convolution filters which are applied in the same way to every area of the image. This way, the network avoids to only apply changes locally. As a result, no edges reduce their cost too much compared to the rest that there is the danger of over-merging of paths. In fact, the predictions are sparser for fewer iterations when the network only had little time to train. With more training the predictions become dense and the shape of the prediction looks more like a ball. 
+\\
+However, even with 200 iterations the random initialisation of the network seems to matter as we can see in figure \ref{2}, where the predictions for three different training periods with a window size of 5 and 200 training iterations are depicted. The ball is predicted to be at very different locations.\\
+ 
+The loss function (Mean Squared Error between computed and updated costs) does not change much in the course of the training, which is why we do not report it in detail. This is not surprising, as we always update every shortest path to the sink. So the only possibility for the loss to decrease is if the updates along two paths cancel on a mutual part. In particular, even a perfect flow that exactly tracks the object, would result in a loss of similar magnitude as one that entirely misses the object. One could avoid this by scaling the update by a factor which decreases with the overlap of the flow in the last frame and the ground truth.\\
+\\
+One can see easily that the overlap of the predictions and the ground truth given by $\frac{\textnormal{area of intersection of prediction and GT}}{\textnormal{joint area of GT and prediction}}$ is rather small and in fact for most of our experiments the prediction misses the ground truth entirely. The exact values can be found in table \ref{overlap}. The better overlaps are achieved for small window size and high iterations. We believe that unfortunately, this is not because the smaller window size are generally better (they are even too small to theoretically track the object correctly) but since for small window sizes, the prediction has no chance to escape too much to the left.
+\\
+A common effect seems to be that instead of just moving upwards, the algorithm predicts the ball to also go to the left. This effect increases with the window size and with the number of iterations. We do not know why the object gets moved to the left by the algorithm and suspect an undetected programming error on our side.\\
+It makes sense that the overall movement increases with the window size, simply because a larger window size allows for larger movement from frame to frame. With a large enough window size and thus large freedom of movement, the algorithms predicts the ball even higher than it is in the ground truth ((j)-(n)). This might be because our training iterations do not converge. In most cases the prediction is as high and as far left as the window size allows. Only in the case of window size 13, the prediction could theoretically be even higher. The fact that the movement also slightly increases with the iterations might show that there is some burning in period.
+
+
+
+\section{Optimal transport via the Sinkhorn algorithm}
+In this section we explore another variant of the MCFP for object tracking. We model the objects location as a probability distribution over the set of pixels of a frame. Given distributions $d^1$ and $d^2$ for the position of the object in two consecutive frames and a cost matrix $C$ for transporting flow between two pixels one can compute the Earth Mover's distance between them, which is the solution to the following linear problem
+\begin{align}\label{EMD}
+\min_{P} &\langle P, C \rangle \textnormal{ s.t. } \\
+& P^T \cdot \mathbbm{1} = d^1,  P\cdot \mathbbm{1} = d^2 \\
+&\forall i, j: p_{ij} \geq 0
+\end{align}
+where $\langle P, C \rangle = \sum_{i,j} P_{ij}C_{ij}$. This can be seen as a transport problem and as such as a MCFP without upper capacity constraints. This linear problem is infeasable to solve for large dimensional distributions as in our case. In order to speed up computation, \cite{Cut13} add an entropy regularisation term of the form $-\frac{1}{\lambda}h(P) := \frac{1}{\lambda}\sum_{i,j} P_{ij}\log(P_{ij})$ to the objective function. The solution of this entropy regularised version of the problem has a special solution, due to which it can quickly be computed using Sinkhorn's algorithm (see \cite{Cut13} Lemma 2). \\
+In our situation, we consider one distribution for each frame of the video, $d^1, \dots, d^N$, representing the location of the object in the frame. $d^1$ and $d^N$ are given as uniform distributions over the object's location in the first and last frame, the others unknown. As before, we let a neural network compute the costs given the video. Let $C^t$ denote the cost for transporting flow between the pixels of frame $t$ and $t+1$. One candidate for the objects position in all frames, could be those distributions $d^2, \dots, d^{N-1}$ for which the optimal transport is minimal:
+\begin{align}\label{EMDtrack}
+&\min_{\{P^t\}_1^{N-1}, \{d^t\}_2^{N-1}} \sum_{t=1}^{N-1} \langle P^t, C^t\rangle \textnormal{ s.t. }\\
+&\forall t: P^{t,T} \cdot \mathbbm{1} = d^t, P\cdot \mathbbm{1} = d^{t+1}
+&\forall i,j,t: P^t_{ij} \geq 0.
+\end{align}
+This problem is equivalent to first computing the lowest cost for transporting flow from a pixel in the first frame to one in the last frame by finding shortest paths through the graph given by connecting all pixels of one frame with all pixels in the next frame. Using the resulting costs between the first and last frame, we are reduced to the classic EMD problem \ref{EMD}. From its solutions we can then construct all the $P^t$'s and $d^t$'s by following the shortest paths computed for the costs. Following \cite{Cut13}, we could speed up the computation time of this equivalent problem by adding an entropic regularisation term. But this might be insufficient to train the neural network well as there is still the discrete computation of shortest paths involved. As discussed above shortest paths behave "jumpy" in the costs and are thus hard to differentiate through. We can try to avoid this by regularising even further. Instead of one global entropic term, we could add entropic regularisers for each $P^t$ in \ref{EMDtrack}. Differentiating the resulting Lagrangian,
+\begin{align}
+L = \sum_{t} \langle P^t, C^t \rangle + \frac{1}{\lambda} h(P^t) + \alpha^{t,T} (P\cdot \mathbbm{1}- d^{t+1}) + \beta
+
+
+
+\end{align}
+
+DIFFERENTIATE THROUGH ITERATIONS
 
 \bibliographystyle{alpha}
 \bibliography{tracking.bib}

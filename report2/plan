@@ -15,7 +15,7 @@ Tracking as min cost flow problem check +
 	Costs produced by NN
 	Flow indicates postion of object
 
-Differentiating through a linear program ..
+Differentiating through a linear program +
 	KKT Konditions, adaptation of OptNet approach for linear program
 	Theoretical issues: 
 		matrix that has to be inverted (or at least should have a solution) does not have full rank (since Q is not positive definite and A does not have full row rank), compare Theorem 1 of OptNet
@@ -57,19 +57,20 @@ Datasets
 	Ball1 
 	Processor
 
-Experiments
+Experiments +
 	pictures given parameter settings 
-	variate window size [3, 5, 9, 11] , iterations [10, 20, 50, 200]
-	obtain orignial picures for comparison
+	variate window size [3, 5, 9, 13] , iterations [10, 50, 200]
 	state that there is not overlap at all
 
-Optimal transport:
+Optimal transport: 
 	transport problem as variant of MCFP
 	first distance approach EMD and Cuturi with entropy regularisation
 	then with undefined interemediate distr
 		just iterate and hope for convergence
 		equivalent problem setting
 	
+conclusion
+
 
 	
 
