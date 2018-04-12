@@ -71,12 +71,8 @@
 \maketitle
 
 \begin{abstract}
-  The abstract paragraph should be indented \nicefrac{1}{2}~inch
-  (3~picas) onboth the left- and right-hand margins. Use 10~point
-  type, with a vertical spacing (leading) of 11~points.  The word
-  \textbf{Abstract} must be centered, bold, and in point size 12. Two
-  line spaces precede the abstract. The abstract must be limited to
-  one paragraph.
+In this work, the purpose of tracking objects using a Minimum-Cost Flow Problem (MCFP) is elaborated. This leads to a linear minimization problem, that we primarily tried to differentiate in the same way as the OptNet Paper [] introduced an approach of differentiating through a quadratic minimization problem. In this way using the gradients as input for a neural network is possible. The practical work confines itself to the special case of computing a shortest path to a graph associated to a video. 
+ 
 \end{abstract}
 
 \section{Differentiate through KKT Conditions}
@@ -94,7 +90,7 @@ Since our first purpose was the application of this process to a minimum-cost fl
 \[ \text{subject to} ~~Af=b,~f\geq 0 ~\text{and}~ f \leq \kappa,\]
 
 where $f$ is the flow through the graph, $c$ is the cost vector and $\kappa$ is the capacity vector related the graph's edges. Together with suitable $A$, $b$ and the inequalities $f\geq 0$, $f\leq \kappa$, this case encodes the MCFP. Now we pursue the OptNet Paper and use the definitions
-\[G\coloneqq \begin{pmatrix} -I \\  I \end{pmatrix} ~~\text{and} ~~ h\coloneqq \begin{pmatrix} 0 \\ h \end{pmatrix} \]
+$G\coloneqq \begin{pmatrix} -I \\  I \end{pmatrix} ~~\text{and} ~~ h\coloneqq \begin{pmatrix} 0 \\ h \end{pmatrix} $
 
 to get the both restrictions $Af=b$ and $Gf\leq h$. Then we obtain the Lagrangian function
 \[L(f, \nu, \lambda) = c^T f + \nu ^T (Af-b) + \lambda^T(Gf-h)\]
@@ -106,14 +102,14 @@ which leads us to the KKT conditions
 D(\lambda^*) (\nabla_\lambda L(f^*, \nu^*, \lambda^*)) = D(\lambda^*)(Gf^*-\kappa) &= 0
 \end{align*}
 
-where D(-) creates a diagonal matrix consisting of the entries of a vector and $f^*$, $\nu^*$ and $\lambda^*$ are the optimal primal and dual variables. After taking the differentials of the KKT conditions we receive 
+where D(-) creates a diagonal matrix consisting of the entries of a vector and $f^*$, $\nu^*$ and $\lambda^*$ are the optimal primal and dual variables. After taking the differentials of the KKT conditions we receive the following matrix equation:
 
-\begin{align*}
-\mathrm{d}c + \mathrm{d}A^T \nu^* + A^T \mathrm{d}\nu + \mathrm{d}G^T \lambda^* + G^T\mathrm{d}\lambda &= 0 \\
-\mathrm{d} A f^* + A\mathrm{d}f - \mathrm{d}b &=0 \\
-D(Gf^*- h) \mathrm{d}\lambda + D(\lambda^*)(\mathrm{d}Gf^* + G\mathrm{d} f - \mathrm{d}h) &=0.
-\end{align*}
-Indeed the following matrix form is equivalent to the upper equations:
+%\begin{align*}
+%\mathrm{d}c + \mathrm{d}A^T \nu^* + A^T \mathrm{d}\nu + \mathrm{d}G^T \lambda^* + G^T\mathrm{d}\lambda &= 0 \\
+%\mathrm{d} A f^* + A\mathrm{d}f - \mathrm{d}b &=0 \\
+%D(Gf^*- h) \mathrm{d}\lambda + D(\lambda^*)(\mathrm{d}Gf^* + G\mathrm{d} f - \mathrm{d}h) &=0.
+%\end{align*}
+%Indeed the following matrix form is equivalent to the upper equations:
 
 \begin{align}
 \begin{pmatrix} 0 & G^T & A^T \\ D(\lambda^*) G & D(Gf^* -h) & 0 \\ A & 0 & 0 \end{pmatrix}
@@ -124,22 +120,15 @@ Indeed the following matrix form is equivalent to the upper equations:
 \end{align}
 where the left hand matrix is from now on called $M$.
 In the next step, we are interested in the derivation $\frac{\partial \ell}{\partial c}\in \mathbb R ^n$, where $\ell: \mathbb{R}^n \rightarrow \mathbb R,~f\mapsto \ell(f) $ is our loss function. So we want to know how the loss varies with respect to the costs of the graph. Later, we also discuss the approach of considering $\frac{\partial \ell}{\partial h}\in \mathbb R^n$, where $h$ carries the information about the capacities $\kappa$. After differentiating the equation (\ref*{diff equation}) by $\partial c$ we obtain
-
-\[
-M \begin{pmatrix} \frac{\partial f}{\partial c} \\[4pt] \frac{\partial\lambda}{\partial c} \\[4pt] \frac{\partial \nu}{\partial c} \end{pmatrix}
+$M \begin{pmatrix} \frac{\partial f}{\partial c} \\[4pt] \frac{\partial\lambda}{\partial c} \\[4pt] \frac{\partial \nu}{\partial c} \end{pmatrix}
 = 
-\begin{pmatrix} -I \\ 0 \\ 0 \end{pmatrix}.
-\]
+\begin{pmatrix} -I \\ 0 \\ 0 \end{pmatrix}.$
+
 If the derivation by $h$ is desired, the right hand side has to be replaced by $(0, I, 0)^T$.
 For the next point, it is necessary to consider the construction of $A$ in a few words. One axis is indexed by the number of pixels in the video plus one vertex for the sink and the other by the edges in the video's graph in lexicographic order. The most entries of $A$ are zeros. In each column are one $1$ and one $-1$ indicating the outgoing and incomming edges regarding the two pixels. So $A$ is the incidence matrix of the graph and it's rank is therefore the number of rows minus 1.
 
-In our case the top left entry of $M$ is the zero matrix and $A$ does not have full rank in contrast to the positive definite matrix $Q$ and full rank matrix $A$ in the OptNet paper in Theorem 1. Therefore, it might happen, that the above equation has no solution at all or a non-unique one, because our matrix $M$ is not invertible. However, we can continue and try to compute a solution (if it exists), which is of course not unique. With this solution for $\frac{\partial f}{\partial c}$ and derivative $\frac{\partial \ell}{\partial f}$, computed above, we could compute the desired derivation
-
-\[
-\frac{\partial \ell }{\partial c} = \frac{\partial \ell}{\partial f} \frac{\partial f}{\partial c}~
-\]
-
-to insert it as the gradient for the neural network. 
+In our case the top left entry of $M$ is the zero matrix and $A$ does not have full rank in contrast to the positive definite matrix $Q$ and full rank matrix $A$ in the OptNet paper in Theorem 1. Therefore, it might happen, that the above equation has no solution at all or a non-unique one, because our matrix $M$ is not invertible. However, we can continue and try to compute a solution (if it exists), which is of course not unique. With this solution for $\frac{\partial f}{\partial c}$ and derivative $\frac{\partial \ell}{\partial f}$, computed above, we could compute the desired derivation$\frac{\partial \ell }{\partial c} = \frac{\partial \ell}{\partial f} \frac{\partial f}{\partial c}~
+$ to insert it as the gradient for the neural network. 
 
 \subsection{Theoretical issues}
 
@@ -162,6 +151,12 @@ The main practical issue is the huge size of the problem. While the OptNet paper
 where the number of edges in the graph corresponds to \[[(\text{window size})^2  * \text{ number of frames in the video} + 1]* \text{ width } * \text{ height }.\] This was a way too much for our computational capabilities, even if we used an extremely shrunk video. 
 Maybe working with sparse matrices could improve the performance, since $A$ is a very sparse matrix. We have not explored it yet, but we expect the problem size still being too big.
 
-Additionally the QP Solver from the OptNet authors did not work, so we were not able to compare their performance and computational results with ours. It also could be possible, that their QP Solver is not even capable of solving our problem without adding a positive definite matrix $Q$. 
+Additionally the QP Solver from the OptNet authors did not work, so we were not able to compare their performance and computational results with ours. It also could be possible, that their QP Solver is not even capable of solving our problem without adding a positive definite matrix $Q$.
+
+
+\section{Datasets}
+
+The videos we used belong to the visual object tracking challenge dataset of the year 2016. To be precise, we utilized the VOT2016 and VOT2016 Ground Truth datasets under the following link \hyperlink{http://www.votchallenge.net/vot2016/dataset.html}{http://www.votchallenge.net/vot2016/dataset.html}. In particular we cropped and shrunk the "ball1" video to avoid too long computations and size problems.
+ 
 
 \end{document}
