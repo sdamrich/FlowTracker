@@ -1,8 +1,0 @@
-\begin{thebibliography}{AK17}
-
-\bibitem[AK17]{AmosK17}
-Brandon Amos and J.~Zico Kolter.
-\newblock Optnet: Differentiable optimization as a layer in neural networks.
-\newblock {\em CoRR}, abs/1703.00443, 2017.
-
-\end{thebibliography}
