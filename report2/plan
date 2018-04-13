@@ -2,7 +2,7 @@ Plan for the programming project report
 
 Abstract
 
-Introduction
+Introduction +
 	Idea of tracking time symmetrically, with annotations in first and last frame
 	Mention that we have two main strategies
 
@@ -30,7 +30,7 @@ Differentiating through a linear program +
 		---> working with sparse matrices would improve performance. Not yet explored
 		QP Solver from OptNet authors does not work
 
-Special cases of MCFP
+Special cases of MCFP +
 	Using shortest paths +
 		Simplification of the problem to shortest paths (ie no capacities), since there are fast solvers for shortest paths problem
 		Instead of differentiating through linear program, good paths are rewarded, bad ones penalised. Should implement uniform penalties. Also, update along all paths, not just those starting in the BB
@@ -62,14 +62,14 @@ Experiments +
 	variate window size [3, 5, 9, 13] , iterations [10, 50, 200]
 	state that there is not overlap at all
 
-Optimal transport: 
+Optimal transport: +
 	transport problem as variant of MCFP
 	first distance approach EMD and Cuturi with entropy regularisation
 	then with undefined interemediate distr
 		just iterate and hope for convergence
 		equivalent problem setting
 	
-conclusion
+conclusion +
 
 
 	

@@ -1,8 +1,25 @@
-\begin{thebibliography}{AK17}
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{LZL{\etalchar{+}}17}
 
 \bibitem[AK17]{AmosK17}
 Brandon Amos and J.~Zico Kolter.
 \newblock Optnet: Differentiable optimization as a layer in neural networks.
 \newblock {\em CoRR}, abs/1703.00443, 2017.
+
+\bibitem[Cut13]{Cut13}
+Marco Cuturi.
+\newblock Sinkhorn distances: Lightspeed computation of optimal transport.
+\newblock In {\em Advances in neural information processing systems}, pages
+  2292--2300, 2013.
+
+\bibitem[LZL{\etalchar{+}}17]{Lee17}
+Kisuk Lee, Jonathan Zung, Peter Li, Viren Jain, and H.~Sebastian Seung.
+\newblock Superhuman accuracy on the {SNEMI3D} connectomics challenge.
+\newblock {\em CoRR}, abs/1706.00120, 2017.
+
+\bibitem[Sin67]{Sink67}
+Richard Sinkhorn.
+\newblock Diagonal equivalence to matrices with prescribed row and column sums.
+\newblock {\em The American Mathematical Monthly}, 74(4):402--405, 1967.
 
 \end{thebibliography}
