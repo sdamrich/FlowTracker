@@ -1,0 +1,63 @@
+\begin{thebibliography}{9}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Amos \& Kolter(2017)Amos and Kolter]{AmosK17}
+Amos, Brandon and Kolter, J.~Zico.
+\newblock Optnet: Differentiable optimization as a layer in neural networks.
+\newblock \emph{CoRR}, abs/1703.00443, 2017.
+\newblock URL \url{http://arxiv.org/abs/1703.00443}.
+
+\bibitem[Berclaz et~al.(2011)Berclaz, Fleuret, Turetken, and Fua]{ber11}
+Berclaz, Jerome, Fleuret, Francois, Turetken, Engin, and Fua, Pascal.
+\newblock Multiple object tracking using k-shortest paths optimization.
+\newblock \emph{IEEE transactions on pattern analysis and machine
+  intelligence}, 33\penalty0 (9):\penalty0 1806--1819, 2011.
+
+\bibitem[Cuturi(2013)]{Cut13}
+Cuturi, Marco.
+\newblock Sinkhorn distances: Lightspeed computation of optimal transport.
+\newblock In \emph{Advances in neural information processing systems}, pp.\
+  2292--2300, 2013.
+
+\bibitem[Lee et~al.(2017)Lee, Zung, Li, Jain, and Seung]{Lee17}
+Lee, Kisuk, Zung, Jonathan, Li, Peter, Jain, Viren, and Seung, H.~Sebastian.
+\newblock Superhuman accuracy on the {SNEMI3D} connectomics challenge.
+\newblock \emph{CoRR}, abs/1706.00120, 2017.
+\newblock URL \url{http://arxiv.org/abs/1706.00120}.
+
+\bibitem[Lenz et~al.(2015)Lenz, Geiger, and Urtasun]{lenz15}
+Lenz, Philip, Geiger, Andreas, and Urtasun, Raquel.
+\newblock Followme: Efficient online min-cost flow tracking with bounded memory
+  and computation.
+\newblock In \emph{Proceedings of the IEEE International Conference on Computer
+  Vision}, pp.\  4364--4372, 2015.
+
+\bibitem[Ochs et~al.(2015)Ochs, Ranftl, Brox, and Pock]{ochs15}
+Ochs, Peter, Ranftl, Ren{\'e}, Brox, Thomas, and Pock, Thomas.
+\newblock Bilevel optimization with nonsmooth lower level problems.
+\newblock In \emph{International Conference on Scale Space and Variational
+  Methods in Computer Vision}, pp.\  654--665. Springer, 2015.
+
+\bibitem[Schulter et~al.(2017)Schulter, Vernaza, Choi, and Chandraker]{sch17}
+Schulter, Samuel, Vernaza, Paul, Choi, Wongun, and Chandraker, Manmohan.
+\newblock Deep network flow for multi-object tracking.
+\newblock \emph{arXiv preprint arXiv:1706.08482}, 2017.
+
+\bibitem[Sinkhorn(1967)]{Sink67}
+Sinkhorn, Richard.
+\newblock Diagonal equivalence to matrices with prescribed row and column sums.
+\newblock \emph{The American Mathematical Monthly}, 74\penalty0 (4):\penalty0
+  402--405, 1967.
+
+\bibitem[Zhang et~al.(2008)Zhang, Li, and Nevatia]{zha08}
+Zhang, Li, Li, Yuan, and Nevatia, Ramakant.
+\newblock Global data association for multi-object tracking using network
+  flows.
+\newblock In \emph{Computer Vision and Pattern Recognition, 2008. CVPR 2008.
+  IEEE Conference on}, pp.\  1--8. IEEE, 2008.
+
+\end{thebibliography}

@@ -1,0 +1,434 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% ICML 2017 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Use the following line _only_ if you're still using LaTeX 2.09.
+%\documentstyle[icml2017,epsf,natbib]{article}
+% If you rely on Latex2e packages, like most moden people use this:
+\documentclass{article}
+
+% use Times
+\usepackage{times}
+% For figures
+\usepackage{graphicx} % more modern
+%\usepackage{epsfig} % less modern
+\usepackage{subcaption} 
+
+% For citations
+\usepackage{natbib}
+
+% For algorithms
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath}
+\usepackage{bbm}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+
+
+% As of 2011, we use the hyperref package to produce hyperlinks in the
+% resulting PDF.  If this breaks your system, please commend out the
+% following usepackage line and replace \usepackage{icml2017} with
+% \usepackage[nohyperref]{icml2017} above.
+\usepackage{hyperref}
+
+% Packages hyperref and algorithmic misbehave sometimes.  We can fix
+% this with the following command.
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Employ the following version of the ``usepackage'' statement for
+% submitting the draft version of the paper for review.  This will set
+% the note in the first column to ``Under review.  Do not distribute.''
+%\usepackage{icml2017} 
+
+% Employ this version of the ``usepackage'' statement after the paper has
+% been accepted, when creating the final version.  This will set the
+% note in the first column to ``Proceedings of the...''
+\usepackage[accepted]{icml2017}
+
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+\icmltitlerunning{Objects flowing through videos}
+
+\begin{document} 
+
+\twocolumn[
+\icmltitle{Objects flowing through videos}
+
+% It is OKAY to include author information, even for blind
+% submissions: the style file will automatically remove it for you
+% unless you've provided the [accepted] option to the icml2017
+% package.
+
+% list of affiliations. the first argument should be a (short)
+% identifier you will use later to specify author affiliations
+% Academic affiliations should list Department, University, City, Region, Country
+% Industry affiliations should list Company, City, Region, Country
+
+% you can specify symbols, otherwise they are numbered in order
+% ideally, you should not use this facility. affiliations will be numbered
+% in order of appearance and this is the preferred way.
+\icmlsetsymbol{equal}{*}
+
+\begin{icmlauthorlist}
+\icmlauthor{Lukas Bold}{equal,HD}
+\icmlauthor{Sebastian Damrich}{equal,HD}
+\end{icmlauthorlist}
+
+\icmlaffiliation{HD}{University of Heidelberg, Heidelberg, Germany}
+
+
+\icmlcorrespondingauthor{Lukas Bold}{lukasbold92@gmail.com}
+\icmlcorrespondingauthor{Sebastian Damrich}{sebastian.damrich@gmx.de}
+
+% You may provide any keywords that you 
+% find helpful for describing your paper; these are used to populate 
+% the "keywords" metadata in the PDF but will not be shown in the document
+\icmlkeywords{boring formatting information, machine learning, ICML}
+
+\vskip 0.3in
+]
+
+% this must go after the closing bracket ] following \twocolumn[ ...
+
+% This command actually creates the footnote in the first column
+% listing the affiliations and the copyright notice.
+% The command takes one argument, which is text to display at the start of the footnote.
+% The \icmlEqualContribution command is standard text for equal contribution.
+% Remove it (just {}) if you do not need this facility.
+
+%\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
+\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
+
+\begin{abstract}
+In this work, we explore ways of tracking objects using a Minimum-Cost Flow Problem (MCFP) whose parameters are the output of a neural network. We find that differentiating through the linear problem by using ideas from the OptNet paper \cite{AmosK17} is not promising, propose workarounds and implement one using shortest-paths. Moreover, we discuss a differentiable approach based on an entropy regularised optimal transport problem \cite{Cut13}. 
+\end{abstract}
+
+
+\section{Introduction}
+In this report, we discuss strategies for tracking an object in a video given the initial position of the object. For training more positions of the object are available. The main idea of all our approaches is to treat the movement of the object as the flow in a graph that is build from connecting the pixels of one frame of the video with the pixels of the next frame. The pixels through which there is flow shall indicate the position of the object. The flow is computed by a variant of the minimal-cost flow problem (MCFP) whose parameters are the output of a neural network. We follow two main trains of thought, which were both suggested by Prof. Hamprecht. In the first one, we examine ways of differentiating through the optimisation problem of the MCFP. We explain why ideas along the lines of \cite{AmosK17} are not suitable for our problem and introduce workarounds for special cases of the MCFP.\\
+The second train of thought considers a special version of the MCFP, namely a version of optimal transport. Here, we do not try to differentiate through the optimisation problem itself, but differentiate through the steps of Sinkhorn's algorithm which solves the entropy regularised problem.
+
+\section{Related Work}
+Min-cost flows are popular for multi-target tracking problems \cite{zha08}. Similar to one of our approaches shortest paths algorithms have been used to reduce the computation time of MCFPs (\cite{ber11}, \cite{lenz15}). \cite{sch17} smooth out the MCFP in order to differentiate the flow by the costs. So, their work is similar to our objective. The main difference, however, is that all the above tracking approaches consider multiple objects which have been detected in a prior step. The graph on which they compute min-cost flows only links up these detections and is thus much smaller than in our setting, where finding the location of the object in late frames is the main aim.\\
+\cite{ochs15} address the general problem of bi-level optimisation problems with a non-smooth lower layer. They propose to differentiate an iterative solution algorithm of the lower layer problem. This has resemblance with the optimal transport idea, which we explore in section \ref{Sinkhorn}. 
+
+\section{Differentiating through a MCFP}
+Out first strategy is to model the movement of the object in the video as a flow which is minimal with respect to some costs. Then we try to differentiate through the MCFP to improve the costs.
+\subsection{Min-Cost-Flow programs}
+Given a directed graph $G=(V,E)$ with edge weights $c$, edge capacities $\kappa$ and vertex supply $b$, the MCFP is the problem of finding a flow of minimal cost along the edges of the graph, which respects the capacity constraints and manages to match up the vertices with positive and negative flow supply. This can be formulated as a linear program:
+\begin{align}\label{MCFP}
+\min_f &\sum_{e \in E} c(e)\,f(e) \textnormal{ s.t.}\nonumber\\
+\forall v \in V: \,&\sum_{(v,w) \in E} f(v,w) = \sum_{(u,v) \in E} f(u,v) + b(v) \\
+\forall	e \in E: \,&0 \leq f(e) \leq \kappa(e) \nonumber
+\end{align}
+where the first condition ensures that flow is conserved and the supply and demand at each vertex are met while the second condition guarantees the capacity constraints. In the following, we will often write $c, b, \kappa$ and $f$ as vectors of length $|E|$.
+
+\subsection{MCFP for object tracking}\label{MCFP for tracking}
+We construct the directed graph on which we want to compute a min-cost-flow as follows: The vertices are given by the pixels of the video in addition of an auxiliary node $t$, which serves as a sink. There are edges from a pixel to a square area of pixels below it in the next frame (pixels close to the borders of the frame have less outgoing edges). We call the length of the sides of this square window size. It should be an odd number. All the pixels in the last frame have an edge to the sink. The flow supply is one for every pixel in the first frame that belongs to the object. This encodes that we know the position of the object in the first frame. All other pixels have a flow supply of zero apart from $t$ which has a flow demand matching the cumulative flow supply.\\
+The costs and capacities of the the graph are the output of a neural networks, which takes the video as input. \\
+Given a min-cost-flow for the above described graph, we predict the location of the object in every frame by the pixels through which there is a positive flow. We can also associate a loss $l$ to a flow. This is done subtracting the the amount of flow that goes through the object in the last frame from the amount of flow that misses the object in the last frame. As a result, we could capture the change of the loss by the flow by the gradient:
+\begin{align}\label{loss}
+\left(\frac{\partial \ell}{\partial f}\right)_{(v,w)} = 
+\begin{cases}
+ 1-2\cdot\mathbbm{1}( v\in\textnormal{object}) &\text{if } w = t\\
+ 0 &\text{else}
+\end{cases}
+\end{align}
+In order to train the neural network, we need to know $\frac{\partial \ell}{\partial c}$ and $\frac{\partial \ell}{\partial\kappa}$. Given $\frac{\partial \ell}{\partial f}$ as above and using the chain rule, the key is to find $\frac{\partial f}{\partial c}$ and $\frac{\partial f}{\partial \kappa}$. In other words, we need to find out how the optimal flow, the solution to the linear program \ref{MCFP}, changes with the problem parameters $c$ and $\kappa$. For this task we explored the ideas of \cite{AmosK17}. If the position of the object in more than the first and last frame is known at training time, one could include them into the loss function. If the position of the object in the last frame is know at testing time, one could omit the sink and uniformly distribute the flow demand over the object's position in the last frame. In this chapter, we focused on the situation where the location of the object in the first and last frame is known at training time but only the initial position is known at test time.
+
+\section{Differentiate through KKT Conditions}
+\label{others}
+
+The OptNet Paper {\cite{AmosK17}  introduced a method for differentiating through a quadratic problem given by
+\[ \min_f \frac{1}{2} f^T Q f + c^T f \]
+\[\text{subject to }~  Af-b=0 ~\text{ and }~ Gf \leq h, \]
+
+where $f\in \mathbb{R}^n$ is the optimization variable, $Q\in \mathbb{R}^{n\times n}$ is a positive semidefinite matrix, $c\in \mathbb{R}^n$, $A\in \mathbb{R}^{m\times n}$, $b\in \mathbb{R}^m$, $G\in \mathbb{R}^{p\times n}$ and $h\in \mathbb{R}^p$ are the data describing the minimization problem. 
+
+Since our first purpose was the application of this process to a minimum-cost flow problem (MCFP) through a graph associated to a video, we could restrict ourselves to a linear optimization problem of the following form:
+
+\[\min_f c^T f\] 
+\[ \text{subject to} ~~Af=b,~f\geq 0 ~\text{and}~ f \leq \kappa,\]
+
+where $f$ is the flow through the graph, $c$ is the cost vector and $\kappa$ is the capacity vector related the graph's edges. Together with suitable $A$, $b$ and the inequalities $f\geq 0$, $f\leq \kappa$, this case encodes the MCFP. Now we pursue the OptNet Paper and use the definitions
+$G\coloneqq \begin{pmatrix} -I \\  I \end{pmatrix} ~~\text{and} ~~ h\coloneqq \begin{pmatrix} 0 \\ h \end{pmatrix} $
+
+to get the both restrictions $Af=b$ and $Gf\leq h$. Then we obtain the Lagrangian function
+\[L(f, \nu, \lambda) = c^T f + \nu ^T (Af-b) + \lambda^T(Gf-h)\]
+which leads us to the KKT conditions
+\begin{align*}
+\nabla_f L(f^*,\nu^*, \lambda^*) = c + A^T \nu^*  + G^T\lambda^* &= 0 \\
+\nabla _\nu L(f^*, \nu^*, \lambda^*) = Af^* - b &= 0 \\
+D(\lambda^*) (\nabla_\lambda L(f^*, \nu^*, \lambda^*)) = D(\lambda^*)(Gf^*-\kappa) &= 0
+\end{align*}
+
+where D(-) creates a diagonal matrix consisting of the entries of a vector and $f^*$, $\nu^*$ and $\lambda^*$ are the optimal primal and dual variables. After taking the differentials of the KKT conditions we receive the following matrix equation:
+%\begin{align*}
+%\mathrm{d}c + \mathrm{d}A^T \nu^* + A^T \mathrm{d}\nu + \mathrm{d}G^T \lambda^* + G^T\mathrm{d}\lambda &= 0 \\
+%\mathrm{d} A f^* + A\mathrm{d}f - \mathrm{d}b &=0 \\
+%D(Gf^*- h) \mathrm{d}\lambda + D(\lambda^*)(\mathrm{d}Gf^* + G\mathrm{d} f - \mathrm{d}h) &=0.
+%\end{align*}
+%Indeed the following matrix form is equivalent to the upper equations:
+\begin{align}\label{diff equation} 
+\begin{pmatrix} 0 & G^T & A^T \\ D(\lambda^*) G & D(Gf^* -h) & 0 \\ A & 0 & 0 \end{pmatrix}
+\begin{pmatrix} \mathrm{d} f \\ \mathrm{d} \lambda \\ \mathrm{d} \nu \end{pmatrix} = \\
+\begin{pmatrix} -\mathrm{d}c - \mathrm{d}G^T \lambda^* -\mathrm{d}A^T\nu^* \\ 
+-D(\lambda^*)\mathrm d G f^* + D(\lambda^*)\mathrm d h \\
+-\mathrm d A f^* + \mathrm d b \end{pmatrix} \nonumber
+\end{align}
+where the left hand matrix is from now on called $M$.
+In the next step, we are interested in the derivation $\frac{\partial \ell}{\partial c}\in \mathbb R ^n$, where $\ell: \mathbb{R}^n \rightarrow \mathbb R,~f\mapsto \ell(f) $ is our loss function. So we want to know how the loss varies with respect to the costs of the graph. Later, we also discuss the approach of considering $\frac{\partial \ell}{\partial h}\in \mathbb R^n$, where $h$ carries the information about the capacities $\kappa$. After differentiating the equation (\ref*{diff equation}) by $\partial c$ we obtain
+$M (\frac{\partial f}{\partial c}, \frac{\partial\lambda}{\partial c}, \frac{\partial \nu}{\partial c})^T
+= ( -I, 0, 0 )^T.$
+If the derivation by $h$ is desired, the right hand side has to be replaced by $(0, I, 0)^T$.
+For the next point, it is necessary to consider the construction of $A$ in a few words. One axis is indexed by the number of pixels in the video plus one vertex for the sink and the other by the edges in the video's graph in lexicographic order. The most entries of $A$ are zeros. In each column are one $1$ and one $-1$ indicating the outgoing and incomming edges regarding the two pixels. So $A$ is the incidence matrix of the graph and it's rank is therefore the number of rows minus 1.\\
+In our case the top left entry of $M$ is the zero matrix and $A$ does not have full rank in contrast to the positive definite matrix $Q$ and full rank matrix $A$ in the OptNet paper in Theorem 1. Therefore, it might happen, that the above equation has no solution at all or a non-unique one, because our matrix $M$ is not invertible. However, we can continue and try to compute a solution (if it exists), which is of course not unique. With this solution for $\frac{\partial f}{\partial c}$ and derivative $\frac{\partial \ell}{\partial f}$, computed above, we could compute the desired derivation$\frac{\partial \ell }{\partial c} = \frac{\partial \ell}{\partial f} \frac{\partial f}{\partial c}~
+$ to insert it as the gradient for the neural network. 
+
+\subsection{Theoretical issues}
+
+The first issue was already mentioned above. We don't know if there exists an analytic solution $(x,y,z)$ for the equation (\ref*{diff equation}). Additionally there would be infinite many solutions $(x,y,z)+ \ker M$ satisfying this equation. Exactly this could become a problem if iterated computations of these solutions with some varied parameters are necessary. The iterated solutions might not go in the same "direction", so that this could lead to unexpected effects. \\
+One possible idea might be to add a "small" quadratic term $Q$ and a full rank matrix $A$ that don't change $M$ in a too dramatically way to obtain a uniquely solvable problem.\\
+If the system has no solution, one can use for example the least square method to get results which we can continue working with.\\
+The feasable set of a linear program is a polyhedron, which is why the function $f:\mathbb R^n \rightarrow \mathbb R^n$, which yields the solution for the optimization problem, is hard to differentiate. Maybe it is possible to add an regularisation term to guarantee the smoothness of the boundaries of the feasable set. A similar approach using an entropic regularisation term is mentioned in the Sinkhorn Distances Paper \cite{Sink67}. \\
+In contrast to the method above, differentiating by capacities has much more continuous properties. If the cost vector changes, the optimal flow could jump in another edge of the polyhedron. Otherwise, if the capacities are changed, the edges of the feasable polyhedron are shifted, what is a continuous process.\\
+It should also be refered to the fact that $f$ itself is not a map in general. Since $f$ is a solution of a linear program, there might be more than one optimal flow. However, in practice $f$ is considered as the flow through a video's graph, so we hope that the different optimal flows don't cause too diverging results. 
+
+
+
+\subsection{Practical issues}
+
+The main practical issue is the huge size of the problem. While the OptNet paper states that more than 1000 parameters are infeasable, we also had realized that without shrinking and cropping the original videos there is no possibility for a acceptable computation time. To be precise, the matrix $A$ has shape $ \big(\text{\# pixels in the video + 1, \# edges of the graph}\big)$
+where the number of edges in the graph corresponds to $[(\text{window size})^2  * \text{ \# frames in the video} + 1]* \text{ width } * \text{ height }.$ This was a way too much for our computational capabilities, even if we used an extremely shrunk video. 
+Maybe working with sparse matrices could improve the performance, since $A$ is a very sparse matrix. We have not explored it yet, but we expect the problem size still being too big.\\
+Additionally the QP Solver from the OptNet authors did not work, so we were not able to compare their performance and computational results with ours. It also could be possible, that their QP Solver is not even capable of solving our problem without adding a positive definite matrix $Q$.
+
+\section{Special cases of the MCFP}
+We saw in the above section, that the approach of \cite{AmosK17} seems not well suited for our problem. Instead of differentiating through the optimisation problem to obtain a gradient for training the neural networks, we therefore use a solver to solve the MCFP problem and then update the parameters of the problem in a way that reduces the loss at least heuristically at the solution. Those updated parameters then serve as targets for the neural network In our analysis, we specialised the general MCFP to two corner cases. This reduces the computation time and highlights different features of costs and capacities.
+
+
+\subsection{Shortest Paths}\label{shortestPaths}
+We explored the situation without upper capacity constraints in some detail. Without upper capacity constrains, the MCFP becomes the problem of finding the shortest paths from the pixels that constitute the object in the first frame to the sink. One advantage of this approach is that there are fast solvers for Shortest Paths problems, such as the Dijkstra  or the Bellman-Ford algorithm.
+\footnote{Due to the special directed structure of our graph, finding shortest paths can be computed by the Dijkstra algorithm (and thus a version of message passing) even when costs are negative.}
+Those paths that do not go through object in the last frame, have lost the object at some point. Therefore, we penalise them by increasing the cost of the edges along such a path by a penalty parameter. One the other hand, paths that go through the object in the last frame are rewarded. The costs along their edges is reduced by the penalty parameter.\\
+The shortest paths algorithm gives the shortest paths from the background of the first picture to the sink for free. In order to increase the amount of information passed to the neural network, we also update the costs along the paths from the background to the sink in the same fashion as before, but in opposite direction: Paths from the background that pass through the background of the last frame are rewarded and those that pass through the object in the last frame are penalised.\\
+One issue with this way of updating costs is that if a path that is penalised and one that is rewarded have a common end (they start in the object and the background respectively, but merge at some point), the rewards and penalties on the common end cancel. The possibility of the merging of paths itself could also be an issue. If an edge has very small cost, it might induce several paths to use this edge and hence to merge. Moreover, without upper bounds on the capacities there is no possibility for two paths to separate once they have merged. This would be particularly problematic when the object increases in size during the video. In general, it might happen that many paths merge at some point and that as a result the last frame is only passed at very few pixels. This would yield degenerated predictions of the objects location. Fortunately, this over-merging does not seem to be an issue, as we will see in section \ref{results_section}.\\
+Dijkstra's algorithm can be seen as a version of message passing and our graph is cicle-free. Thus, one could also try to differentiate the flow with respect to the costs by unrolling the message passing iterations over time and differentiating them.
+
+\subsection{Maximum Flow}
+The other extreme case of a MCFP would be to focus entirely on the capacities rather than the costs. By setting the costs to zero for all edges, the cost-minimisation problem becomes ill-defined. In order to dodge this problem, one could replace the cost-minimisation problem with a flow maximisation problem. Instead of defining a fixed flow supply for the nodes in the first frame and the sink, one could allow the pixels that constitute the object in the first frame to send as much flow as possible and the sink to take in as much flow as possible. For all other pixels flow-in equals flow-out still applies. The resulting linear program would look like this 
+\begin{align}\label{MFP}
+\max_f &\sum_{(v,t) \in E} f(v,t) \textnormal{ s.t.}\nonumber\\
+\forall v \in V\setminus\left(V' \cup \{ t\}\right) \, & \sum_{(v,w) \in E} f(v,w) = \sum_{(u,v) \in E} f(u,v) \\
+\forall	e \in E: \, & 0 \leq f(e) \leq \kappa(e) \nonumber
+\end{align} 
+where $V'$ are the pixels in the first frame that constitute the object. One advantage of such a simplification of the MCFP is that there are several fast algorithms for solving a maximum flow problem, for instance the Ford-Fulkerson (or Edmund-Karp) algorithm or the Pre-Flow-Push algorithm. So as above, one could let a neural network predict capacities given the video, then find a maximum flow through the resulting network and finally update the capacities in a meaningful way to provide an update direction for the neural network. Similar to the case of shortest paths, one way to update the capacities is to increase the capacities along a path of positive flow to the object in the last frame and to decrease the capacities (bearing in mind the lower bound of zero capacity) along a path of positive flow to a background pixel in the last frame. A theoretical appeal of this strategy is that it nicely matches up with the notion of augmenting paths that are used to determine a maximum flow with the Ford-Fulkerson algorithm.\\
+Another advantage of using capacities rather than costs is that maximum flow behaves more continuously and piecewise even differentiably with regard to the capacities in contrast to the case of a change in the costs. Changing the capacity of an edge on which the flow is not maximal infinitesimally, does not change the flow at all. Decreasing the capacity of an edge on which the flow is maximal, reduces the flow on that edge with a derivative of one. Increasing the capacity on such an edge either increases the flow on that edge with derivative one (if the network allows more flow to enter and leave the edge) or it does not change the flow on that edge at all. The effect on other edges can be manifold, due to the non uniqueness of a maximal flow on some networks, however there always are maximal flows that change piecewise differentiably on all edges with respect to the edges. \\
+Normalising the loss from section \ref{MCFP for tracking} by the size of the flow and pretending that changing the capacity of an edge with maximal flow always results in a derivative of one yields a crude approximation to a derivative $\frac{\partial \ell}{\partial \kappa}$:
+\begin{align*}
+\left(\frac{\partial \ell}{\partial \kappa}\right)_{(v,w)} = 
+\begin{cases}
+\frac{1 - 2 \cdot \mathbbm{1}(w\in \textnormal{object})}{\sum_{(u,t)} f(u,t)} &\textnormal{if } w \textnormal{ is in last frame and }\\
+& f(v,w) = \kappa(v,w)\\
+0 &\textnormal{else}
+\end{cases}
+\end{align*}
+However, this is more or less just updating the capacities of edges leading towards the last frame depending on whether they lead to the object or not. This latter approach however seems to resemble more an object detection scheme than an object tracking one.\\
+An upside of using capacities is that in contrast to using shorest paths capacities can handle a magnifying object well.
+
+\section{Optimal transport via the Sinkhorn algorithm}\label{Sinkhorn}
+In this section we explore another variant of the MCFP for object tracking. We model the object's location as a probability distribution over the set of pixels of a frame. Given the first and last position of the object we want to predict its position in the intermediate frames. With distributions $d^1$ and $d^2$ for the position of the object in two consecutive frames and a cost matrix $C$ for transporting flow between any pixel in one frame to any pixel in the other frame, one can compute the Earth Mover's distance between them, which is the following linear problem
+\begin{align}\label{EMD}
+\min_{P} &\langle P, C \rangle \textnormal{ s.t. } \\
+ P^T \cdot \mathbbm{1} &= d^1,  P\cdot \mathbbm{1} = d^2 \nonumber\\
+&\forall i, j: P_{ij} \geq 0 \nonumber
+\end{align}
+where $\langle P, C \rangle = \sum_{i,j} P_{ij}C_{ij}$. This can be seen as a transport problem and as such as a MCFP without upper capacity constraints. The linear problem is infeasable to solve for large dimensional distributions as in our case. In order to speed up computation, \cite{Cut13} adds an entropy regularisation term of the form $-\frac{1}{\lambda}h(P) := \frac{1}{\lambda}\sum_{i,j} P_{ij}\log(P_{ij})$ to the objective function. The solution of this entropy regularised version of the problem has a special form, due to which it can quickly be computed using Sinkhorn's algorithm (\cite{Sink67} and \cite{Cut13} Lemma 2). \\
+In our situation, we consider one distribution for each frame of the video, $d^1, \dots, d^N$, of which $d^1$ and $d^N$ are given as uniform distributions over the object's location in the first and last frame. The others are unknown. As before, we let a neural network compute the costs from the video. Let $C^t$ denote the cost for transporting flow between the pixels of frame $t$ and $t+1$. Candidates for the object's position in all frames, could be those distributions $d^2, \dots, d^{N-1}$ for which the optimal transport is minimal:
+\begin{align}\label{EMDtrack}
+&\min_{\{P^t\}_{t=1}^{N-1}, \{d^t\}_{t=2}^{N-1}} \sum_{t=1}^{N-1} \langle P^t, C^t\rangle \textnormal{ s.t. }\\
+&\forall t: P^{t,T} \cdot \mathbbm{1} = d^t, P^t\cdot \mathbbm{1} = d^{t+1} \nonumber\\
+&\forall i,j,t: P^t_{ij} \geq 0.\nonumber
+\end{align}
+Note that the $d^t$'s are automatically distributions by the above constraints and the fact that $d^1$ is. This problem is equivalent to first computing the lowest cost, $C^*$, for transporting flow from a pixel in the first frame to one in the last frame by finding shortest paths through the graph given by connecting all pixels of one frame with all pixels in the next frame. Using $C^*$, we are reduced to the classic EMD problem \ref{EMD}. From its solutions we can then construct all the $P^t$'s and $d^t$'s by following the shortest paths computed $C^*$. As in \cite{Cut13}, we could speed up the computation time of this equivalent problem by adding an entropic regularisation term. But this might be insufficient to train the neural network well as there is still the discrete computation of shortest paths involved. As discussed above shortest paths behave "jumpy" in the costs and are thus hard to differentiate through. We can try to avoid this by regularising even further. Instead of one global entropic term we could add entropic regularisers for each $P^t$ in \ref{EMDtrack}. To ease notation, we also substract the  constant $\frac{N-1}{\lambda} = \frac{1}{\lambda} \sum_{t, i, j} P^t_{ij}$. From resulting Lagrangian, $L$, we can deduce:
+\begin{align*}
+L\left(\{P^t, \alpha^t, \beta^t\}_{t=1}^{N-1}\right)
+= \sum_{t} \langle P^t, C^t \rangle + \frac{1}{\lambda} h(P^t) + \\
+\alpha^{t T} (P^t\cdot \mathbbm{1}- d^{t+1}) + \beta^{t T}(P^{tT} \cdot \mathbbm{1} - d^t) \\
+P^t_{ij} = \exp\left(-\frac{\alpha_i^t}{\lambda}\right) \exp\left(-\frac{M^t_{ij}}{\lambda}\right) \exp\left(- \frac{\beta_j^t}{\lambda}\right)
+\end{align*}
+In other words, the transport matrices again have the form
+\begin{align*}
+P^t = D(u^t)\cdot K^t \cdot D(v^t) 
+\end{align*}
+for $K^t = \exp\left(-\frac{C^t}{\lambda}\right)$, $u^t = \exp\left(-\frac{\alpha^t}{\lambda}\right)$, \break $v^t=\exp\left(- \frac{\beta^t}{\lambda}\right)$ elementwise. If the distributions $d^t$ were all fixed, we could again use the simple iterations of the Sinkhorn algorithm \cite{Sink67} to find the $P^t$. They come from the fact that the row and column sums of $P^t$ must be $d^{t+1}$ and $d^t$, respectively, and are:
+\begin{align}\label{SinkhornIter}
+u^t = d^{t+1} \oslash K^t v^t \textnormal{ and } v^t = d^t \oslash K^{tT} u^t,
+\end{align}
+where $\oslash$ ($\otimes$) means elementwise division (multiplication). Since $d^2, \dots, d^{T-1}$ are also optimisation variables, we have to update them too, for instance via:
+\begin{align}\label{distIter}
+d^{t+1} = u^t \otimes K^t v^t \textnormal{ and } d^t = v^t \otimes K^{tT} u^t.
+\end{align}
+Alternating between the iterations in \ref{SinkhornIter} and \ref{distIter} leads to many but very simple updates. Despite this not being a true instance of the Sinkhorn algorithm, we hope that the process converges fast. After some stopping criterion is reached, we could compute a cross entropy loss between the $\{d^t\}_{t=2}^{T-1}$ and distributions coming from the true position of the object. This loss could be differentiated by the $d^t$'s and then by unrolling the iterations of \ref{SinkhornIter} and \ref{distIter} also by the costs, so that we can train the neural network. Once the network is trained we can use this approach to track an object in a video, given its position in the first and last frame. We could also make this approach more similar to the one before by only fixing $d^1$ and computing the loss just using $d^N$.
+
+\section{Implementation}
+We have implemented the shortest paths approach.\footnote{\url{https://github.com/sdamrich/FlowTracker}}  For the neural network we drew inspiration from the architecture of \cite{Lee17}. The network is a convolutional network with a shallow U-form. A ReLu layer follows each convolutional layer. As described in \cite{Lee17}, at first two 2D convolutions are applied. We use a kernel size equal to the window size of the graph. The 2D convolutions increase the channel number from 3 over 5 to 10. Padding is used to keep the original dimensions. The result is recorded, let us call it $X$ and a copy is 2D max pooled to decrease the dimensions of the frames by a factor of 2. Then, the video is 3D convoluted to introduce time dependency. The 3D convolutions keep the channel number constants.  First, we use a kernel of dimensions (3, window size, window size). So, the convolution sees a square area of length window size in three consecutive frames. It should be noted, that this corresponds to information being convoluted that comes from an area of side length twice the window size as we have pooled before. We apply padding to keep the dimensions. Afterwards, we use a kernel of dimensions (2, window size, window size) with padding to keep the latter two dimensions. As a result, we reduce the time dimension by one. Then we upsample trilinearly keeping the time dimension but restoring width and height of the frames to the original values, let us call the result $Y$. Before adding the 2D information $X$ and the 3D information $Y$, we convolute $X$ in the time dimension with a kernel of size 2 to match up dimensions. 
+In the last step, we apply a 2D convolution layer with a kernel of window size, which gives out $\textnormal{window size}^2$ many channels. Here we do not apply a ReLu layer. We interpret the channels of the output as the costs for edges going out of a pixel.\\ 
+The graph is built explicitly using the 
+graph\_tool package. Since we build a large graph, we chose this performant package. \footnote{\url{https://graph-tool.skewed.de/performance}} Finally, we use a Mean Squared Error between the computed and the updated costs as loss for the neural network.
+
+DOCUMENT THE GITHUB
+
+\section{Experiments}
+\subsection{Datasets}
+The videos we used belong to the visual object tracking challenge dataset of the year 2016. To be precise, we utilized the VOT2016 and VOT2016 Ground Truth datasets available under the following links \hyperlink{http://www.votchallenge.net/vot2016/dataset.html}{http://www.votchallenge.net/vot2016/dataset.html}. We cropped the video "ball1" to an area around the object of interest and shrunk the result to $64^2$ pixel to avoid long computations and size problems.
+\subsection{Results}\label{results_section}
+
+\begin{figure}
+\label{results}
+    \centering
+    
+	\begin{subfigure}[b]{0.15\textwidth}
+		\centering    
+        \includegraphics[width=\textwidth]{../results/GT0.png}
+        \caption{GT first frame}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../results/GTl.png}
+        \caption{GT last frame}
+    \end{subfigure}%
+    
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w3_iter10.png}
+        \caption{w = 3, iter = 10}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w3_iter50.png}
+        \caption{w = 3, iter = 50}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w3_iter200.png}
+        \caption{w = 3, iter = 200}
+    \end{subfigure}
+   
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w5_iter10.png}
+        \caption{w = 5, iter = 10}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w5_iter50.png}
+        \caption{w = 5, iter = 50}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w5_iter200.png}
+        \caption{w = 5, iter = 200}
+    \end{subfigure}
+
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w9_iter10.png}
+        \caption{w = 9, iter = 10}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w9_iter50.png}
+        \caption{w = 9, iter = 50}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w9_iter200.png}
+        \caption{w = 9, iter = 200}
+    \end{subfigure}
+
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w13_iter10.png}
+        \caption{w = 13, iter = 10}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w13_iter50.png}
+        \caption{w = 13, iter = 50}
+    \end{subfigure}    
+    \begin{subfigure}[t]{0.15\textwidth}
+        \centering
+        \includegraphics[width = \textwidth]{../results/Pred_w13_iter200.png}
+        \caption{w=13, iter = 200}
+    \end{subfigure}
+    
+    \caption{Ground truth and predictions for $w \in \{3,5,9,13\}$ and $\textnormal{iter} \in \{10, 50, 200\}$}
+
+\end{figure}
+\begin{figure}
+\centering
+
+	\begin{subfigure}[b]{0.15\textwidth}
+		\centering    
+        \includegraphics[width=\textwidth]{../results/Pred_w5_iter200_bad.png}
+    \end{subfigure}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\centering    
+        \includegraphics[width=\textwidth]{../results/Pred_w5_iter200_ok.png}
+    \end{subfigure}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\centering    
+        \includegraphics[width=\textwidth]{../results/Pred_w5_iter200.png}
+    \end{subfigure}
+    
+    \caption{Predictions of three different trainings with window size 5 and 200 training iterations.}
+    
+\end{figure}
+
+\begin{table}[b]
+  \caption{Overlap of prediction and ground truth}
+  \label{overlap}
+  \centering
+  \begin{tabular}{llllll}
+			    & &Iterations &&\\
+                &    & 10    & 50    & 200 \\
+    Window size & 3  & 0.227 & 0.302 & 0.411 \\
+                & 5  & 0.094 & 0.110 & 0.075 \\
+                & 9  & 0.000 & 0.000 & 0.000 \\
+                & 13 & 0.000 & 0.000 & 0.000 \\
+  \end{tabular}
+\end{table}
+
+We have tested the algorithm for window sizes 3, 5, 9 and 13 and training iterations for the network of 10, 50 and 200 on the first 5 frames of the cropped and shrunk video "ball1". The resulting predictions are shown in figure \ref{results}. The ball moves upwards between the first and last frame. The main result is that the algorithm tends to preserve the shape of the ball, but does not follow its movement, even though it was trained and tested on the same video. Therefore, we refrained from scaling up our experiments to several training and test videos.\\
+We see that the anticipated over-merging problem from section \ref{shortestPaths} does not appear. The predictions in the last frame, though misplaced are rather dense and of the correct shape. We believe that this is because we use a convolutional network for computing the costs. When the network is told that some cost should be changed, it has to update its convolution filters which are applied in the same way to every area of the image. This way, the network avoids to only apply changes locally. As a result, no edges reduce their cost too much compared to the rest that there is the danger of over-merging of paths. In fact, the predictions are sparser for fewer iterations when the network only had little time to train. With more training the predictions become dense and the shape of the prediction tends looks more like a ball. \\
+However, even with 200 iterations the random initialisation of the network seems to matter as we can see in figure \ref{2}, where the predictions for three different training periods with a window size of 5 and 200 training iterations are depicted. The ball is predicted to be at very different locations.\\
+The MSE between the computed and updated costs does not change much in the course of the training, which is why we do not report it in detail. This is not surprising, as we always update every shortest path to the sink. So the only possibility for the loss to decrease is if the updates along two paths cancel on a mutual part. In particular, even a perfect flow that exactly tracks the object, would result in a loss of similar magnitude as one that entirely misses the object. One could avoid this by scaling the update by a factor which decreases with the overlap of the flow in the last frame and the ground truth.\\
+A common effect seems to be that instead of just moving upwards, the algorithm predicts the ball to also go to the left. This effect increases with the window size and with the number of iterations. We do not know why the object gets moved to the left by the algorithm and suspect an undetected programming error on our side.\\
+It makes sense that the overall movement increases with the window size, simply because a larger window size allows for larger movement from frame to frame. 
+The ball moves upwards so fast that it can only be properly tracked with window sizes 9 and 13. However, in these cases the algorithm predicts the ball even higher than it is in the ground truth ((j)-(n)). This might be because we did not scale down the updates for later iterations (or high overlap), so that there is no possibility for the training to converge. In most cases the prediction is as high and as far left as the window size allows. Only in the case of window size 13, the prediction could theoretically be even higher. The fact that the movement also slightly increases with the iterations might show that there is some burning in period.\\
+One can see easily that the overlap of the predictions and the ground truth given by $\frac{\textnormal{area of intersection of prediction and GT}}{\textnormal{joint area of GT and prediction}}$ is rather small and in fact for most of our experiments the prediction misses the ground truth entirely. The exact values can be found in table \ref{overlap}. The better overlaps are achieved for small window size and high iterations. We believe that unfortunately, this is not because the smaller window size are generally better (they are even too small to theoretically track the object correctly) but since for small window sizes, the prediction has no chance to escape too much to the left.
+
+\section{Conclusion}
+There are several possible ways of using Min-Cost Flows for object tracking in videos. Such an optimisation problem looks at the whole video at once and does not propagate the position of the object iteratively through the video. This way information about the location of the object in different frames can be used in a unified manner. An issue with using MCFPs for object tracking is the large resulting problem size, which can make directly soling the linear problem or even differentiating through it prohibitively expensive. Another problem is the non-continuous change of an optimal flow with respect to the costs. Both the long computation time and the poor differentiability could potentially be mitigated by regularising the linear problem. Thus, it would be interesting to pursue and implement the ideas of section \ref{Sinkhorn} and to explore possbilities of transferring the ideas of \cite{sch17} to our case.
+
+\bibliography{tracking.bib}
+\bibliographystyle{icml2017}
+
+\end{document} 
+
+
+% This document was modified from the file originally made available by
+% Pat Langley and Andrea Danyluk for ICML-2K. This version was
+% created by Lise Getoor and Tobias Scheffer, it was slightly modified  
+% from the 2010 version by Thorsten Joachims & Johannes Fuernkranz, 
+% slightly modified from the 2009 version by Kiri Wagstaff and 
+% Sam Roweis's 2008 version, which is slightly modified from 
+% Prasad Tadepalli's 2007 version which is a lightly 
+% changed version of the previous year's version by Andrew Moore, 
+% which was in turn edited from those of Kristian Kersting and 
+% Codrina Lauth. Alex Smola contributed to the algorithmic style files.  
