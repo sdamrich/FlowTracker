@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2017.10.20)  14 APR 2018 12:29
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2017.10.20)  14 APR 2018 13:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -511,23 +511,23 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
-Overfull \hbox (2.20543pt too wide) in paragraph at lines 239--239
+Overfull \hbox (2.20543pt too wide) in paragraph at lines 238--238
 [] 
  []
 
 [4]
-Underfull \hbox (badness 4291) in paragraph at lines 271--274
+Underfull \hbox (badness 5203) in paragraph at lines 270--273
 \OT1/ptm/m/n/10 for $\OML/cmm/m/it/10 K[] \OT1/cmr/m/n/10 = [] []$\OT1/ptm/m/n/
 10 , $\OML/cmm/m/it/10 u[] \OT1/cmr/m/n/10 = [] []$\OT1/ptm/m/n/10 , 
  []
 
 [5]
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 284.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 283.
 
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 284--284
+Underfull \hbox (badness 10000) in paragraph at lines 283--283
 [][][][][]$\OT1/pcr/m/n/9 https : / / github . com / sdamrich / FlowTracker /
  []
 
@@ -535,138 +535,138 @@ Underfull \hbox (badness 10000) in paragraph at lines 284--284
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
-Underfull \hbox (badness 1107) in paragraph at lines 291--292
+Underfull \hbox (badness 1107) in paragraph at lines 290--291
 \OT1/ptm/m/n/10 ing chal-lenge dataset of the year 2016. To be pre-
  []
 
 
-Underfull \hbox (badness 7291) in paragraph at lines 291--292
+Underfull \hbox (badness 7291) in paragraph at lines 290--291
 \OT1/ptm/m/n/10 Truth datasets avail-able un-der the fol-low-ing links
  []
 
 
-Underfull \hbox (badness 4846) in paragraph at lines 291--292
+Underfull \hbox (badness 4846) in paragraph at lines 290--291
 [][]\OT1/ptm/m/n/10 http://www.votchallenge.net/vot2016/dataset.html[][]. We
  []
 
-<../results/GT0.png, id=144, 462.528pt x 346.896pt>
+<../results/GT0.png, id=145, 462.528pt x 346.896pt>
 File: ../results/GT0.png Graphic file (type png)
 <use ../results/GT0.png>
-Package pdftex.def Info: ../results/GT0.png  used on input line 300. on input l
-ine 300.
-Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-00.
-<../results/GTl.png, id=146, 462.528pt x 346.896pt>
+Package pdftex.def Info: ../results/GT0.png  used on input line 299. on input l
+ine 299.
+Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 2
+99.
+<../results/GTl.png, id=147, 462.528pt x 346.896pt>
 File: ../results/GTl.png Graphic file (type png)
 <use ../results/GTl.png>
-Package pdftex.def Info: ../results/GTl.png  used on input line 305. on input l
-ine 305.
+Package pdftex.def Info: ../results/GTl.png  used on input line 304. on input l
+ine 304.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-05.
-<../results/Pred_w3_iter10.png, id=147, 462.528pt x 346.896pt>
+04.
+<../results/Pred_w3_iter10.png, id=148, 462.528pt x 346.896pt>
 File: ../results/Pred_w3_iter10.png Graphic file (type png)
 <use ../results/Pred_w3_iter10.png>
-Package pdftex.def Info: ../results/Pred_w3_iter10.png  used on input line 311.
- on input line 311.
+Package pdftex.def Info: ../results/Pred_w3_iter10.png  used on input line 310.
+ on input line 310.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-11.
-<../results/Pred_w3_iter50.png, id=148, 462.528pt x 346.896pt>
+10.
+<../results/Pred_w3_iter50.png, id=149, 462.528pt x 346.896pt>
 File: ../results/Pred_w3_iter50.png Graphic file (type png)
 <use ../results/Pred_w3_iter50.png>
-Package pdftex.def Info: ../results/Pred_w3_iter50.png  used on input line 316.
- on input line 316.
+Package pdftex.def Info: ../results/Pred_w3_iter50.png  used on input line 315.
+ on input line 315.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-16.
-<../results/Pred_w3_iter200.png, id=149, 462.528pt x 346.896pt>
+15.
+<../results/Pred_w3_iter200.png, id=150, 462.528pt x 346.896pt>
 File: ../results/Pred_w3_iter200.png Graphic file (type png)
 <use ../results/Pred_w3_iter200.png>
-Package pdftex.def Info: ../results/Pred_w3_iter200.png  used on input line 321
-. on input line 321.
+Package pdftex.def Info: ../results/Pred_w3_iter200.png  used on input line 320
+. on input line 320.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-21.
-<../results/Pred_w5_iter10.png, id=150, 462.528pt x 346.896pt>
+20.
+<../results/Pred_w5_iter10.png, id=151, 462.528pt x 346.896pt>
 File: ../results/Pred_w5_iter10.png Graphic file (type png)
 <use ../results/Pred_w5_iter10.png>
-Package pdftex.def Info: ../results/Pred_w5_iter10.png  used on input line 327.
- on input line 327.
+Package pdftex.def Info: ../results/Pred_w5_iter10.png  used on input line 326.
+ on input line 326.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-27.
-<../results/Pred_w5_iter50.png, id=151, 462.528pt x 346.896pt>
+26.
+<../results/Pred_w5_iter50.png, id=152, 462.528pt x 346.896pt>
 File: ../results/Pred_w5_iter50.png Graphic file (type png)
 <use ../results/Pred_w5_iter50.png>
-Package pdftex.def Info: ../results/Pred_w5_iter50.png  used on input line 332.
- on input line 332.
+Package pdftex.def Info: ../results/Pred_w5_iter50.png  used on input line 331.
+ on input line 331.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-32.
-<../results/Pred_w5_iter200.png, id=152, 462.528pt x 346.896pt>
+31.
+<../results/Pred_w5_iter200.png, id=153, 462.528pt x 346.896pt>
 File: ../results/Pred_w5_iter200.png Graphic file (type png)
 <use ../results/Pred_w5_iter200.png>
-Package pdftex.def Info: ../results/Pred_w5_iter200.png  used on input line 337
-. on input line 337.
+Package pdftex.def Info: ../results/Pred_w5_iter200.png  used on input line 336
+. on input line 336.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-37.
-<../results/Pred_w9_iter10.png, id=153, 462.528pt x 346.896pt>
+36.
+<../results/Pred_w9_iter10.png, id=154, 462.528pt x 346.896pt>
 File: ../results/Pred_w9_iter10.png Graphic file (type png)
 <use ../results/Pred_w9_iter10.png>
-Package pdftex.def Info: ../results/Pred_w9_iter10.png  used on input line 343.
- on input line 343.
+Package pdftex.def Info: ../results/Pred_w9_iter10.png  used on input line 342.
+ on input line 342.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-43.
-<../results/Pred_w9_iter50.png, id=154, 462.528pt x 346.896pt>
+42.
+<../results/Pred_w9_iter50.png, id=155, 462.528pt x 346.896pt>
 File: ../results/Pred_w9_iter50.png Graphic file (type png)
 <use ../results/Pred_w9_iter50.png>
-Package pdftex.def Info: ../results/Pred_w9_iter50.png  used on input line 348.
- on input line 348.
+Package pdftex.def Info: ../results/Pred_w9_iter50.png  used on input line 347.
+ on input line 347.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-48.
-<../results/Pred_w9_iter200.png, id=155, 462.528pt x 346.896pt>
+47.
+<../results/Pred_w9_iter200.png, id=156, 462.528pt x 346.896pt>
 File: ../results/Pred_w9_iter200.png Graphic file (type png)
 <use ../results/Pred_w9_iter200.png>
-Package pdftex.def Info: ../results/Pred_w9_iter200.png  used on input line 353
-. on input line 353.
+Package pdftex.def Info: ../results/Pred_w9_iter200.png  used on input line 352
+. on input line 352.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-53.
-<../results/Pred_w13_iter10.png, id=156, 462.528pt x 346.896pt>
+52.
+<../results/Pred_w13_iter10.png, id=157, 462.528pt x 346.896pt>
 File: ../results/Pred_w13_iter10.png Graphic file (type png)
 <use ../results/Pred_w13_iter10.png>
-Package pdftex.def Info: ../results/Pred_w13_iter10.png  used on input line 359
-. on input line 359.
+Package pdftex.def Info: ../results/Pred_w13_iter10.png  used on input line 358
+. on input line 358.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-59.
-<../results/Pred_w13_iter50.png, id=157, 462.528pt x 346.896pt>
+58.
+<../results/Pred_w13_iter50.png, id=158, 462.528pt x 346.896pt>
 File: ../results/Pred_w13_iter50.png Graphic file (type png)
 <use ../results/Pred_w13_iter50.png>
-Package pdftex.def Info: ../results/Pred_w13_iter50.png  used on input line 364
-. on input line 364.
+Package pdftex.def Info: ../results/Pred_w13_iter50.png  used on input line 363
+. on input line 363.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-64.
-<../results/Pred_w13_iter200.png, id=158, 462.528pt x 346.896pt>
+63.
+<../results/Pred_w13_iter200.png, id=159, 462.528pt x 346.896pt>
 File: ../results/Pred_w13_iter200.png Graphic file (type png)
 <use ../results/Pred_w13_iter200.png>
 Package pdftex.def Info: ../results/Pred_w13_iter200.png  used on input line 36
-9. on input line 369.
+8. on input line 368.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-69.
-<../results/Pred_w5_iter200_bad.png, id=159, 462.528pt x 346.896pt>
+68.
+<../results/Pred_w5_iter200_bad.png, id=160, 462.528pt x 346.896pt>
 File: ../results/Pred_w5_iter200_bad.png Graphic file (type png)
 <use ../results/Pred_w5_iter200_bad.png>
 Package pdftex.def Info: ../results/Pred_w5_iter200_bad.png  used on input line
- 381. on input line 381.
+ 380. on input line 380.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-81.
-<../results/Pred_w5_iter200_ok.png, id=160, 462.528pt x 346.896pt>
+80.
+<../results/Pred_w5_iter200_ok.png, id=161, 462.528pt x 346.896pt>
 File: ../results/Pred_w5_iter200_ok.png Graphic file (type png)
 <use ../results/Pred_w5_iter200_ok.png>
 Package pdftex.def Info: ../results/Pred_w5_iter200_ok.png  used on input line 
-385. on input line 385.
+384. on input line 384.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-85.
+84.
 File: ../results/Pred_w5_iter200.png Graphic file (type png)
 <use ../results/Pred_w5_iter200.png>
-Package pdftex.def Info: ../results/Pred_w5_iter200.png  used on input line 389
-. on input line 389.
+Package pdftex.def Info: ../results/Pred_w5_iter200.png  used on input line 388
+. on input line 388.
 Package pdftex.def Info: Requested size: 73.1704pt x 54.87459pt on input line 3
-89.
+88.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
@@ -697,17 +697,17 @@ R\OT1/ptm/m/n/10 ,
  []
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 428.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 427.
  [8
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 428.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 427.
  (./finalReport.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 428.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 428.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 427.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 427.
 Package rerunfilecheck Info: File `finalReport.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 428.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 427.
  )
 (\end occurred inside a group at level 1)
 
@@ -720,7 +720,7 @@ Here is how much of TeX's memory you used:
  11694 multiletter control sequences out of 15000+600000
  31230 words of font info for 70 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 42i,17n,45p,1760b,512s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,17n,45p,1761b,512s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{http://www.votchallenge.net/vot2016
 /dataset.html} has been referenced but does not exist, replaced by a fixed one
 
@@ -746,10 +746,10 @@ w/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8
 a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/sha
 re/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on finalReport.pdf (8 pages, 379175 bytes).
+Output written on finalReport.pdf (8 pages, 379673 bytes).
 PDF statistics:
- 306 PDF objects out of 1000 (max. 8388607)
- 238 compressed objects within 3 object streams
+ 307 PDF objects out of 1000 (max. 8388607)
+ 239 compressed objects within 3 object streams
  52 named destinations out of 1000 (max. 500000)
  81 words of extra memory for PDF output out of 10000 (max. 10000000)
 
