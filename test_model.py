@@ -5,7 +5,7 @@ import numpy as np
 
 # hyperparameter
 max_frames = 5
-window = 5
+window = 3
 iterations = 10
 
 
@@ -28,15 +28,15 @@ FM.predict(video.frames, GT.frames[0], GT.frames[1])
 # print the GT for the first and last frame as well as the prediction
 plt.figure()
 plt.title('Ground Truth first Frame')
-plt.imshow(GT.frames[0])
+plt.imshow(GT.frames[0], cmap = 'gray')
 
 plt.figure()
 plt.title('Prediction')
-plt.imshow(FM.prediction)
+plt.imshow(FM.prediction, cmap = 'gray')
 
 plt.figure()
 plt.title('Ground Truth last Frame')
-plt.imshow(GT.frames[-1])
+plt.imshow(GT.frames[-1], cmap = 'gray')
 
 plt.show()
 
