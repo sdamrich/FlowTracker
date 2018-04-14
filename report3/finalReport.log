@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2017.10.20)  14 APR 2018 13:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2017.10.20)  14 APR 2018 13:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -697,25 +697,23 @@ R\OT1/ptm/m/n/10 ,
  []
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 427.
- [8
-
-]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 427.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 430.
+ [8]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 430.
  (./finalReport.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 427.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 427.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 430.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 430.
 Package rerunfilecheck Info: File `finalReport.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 427.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 430.
  )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 146 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 8572 strings out of 494838
- 129526 string characters out of 6177475
+ 8573 strings out of 494838
+ 129536 string characters out of 6177475
  233889 words of memory out of 5000000
  11694 multiletter control sequences out of 15000+600000
  31230 words of font info for 70 fonts, out of 8000000 for 9000
@@ -746,10 +744,10 @@ w/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8
 a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/sha
 re/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on finalReport.pdf (8 pages, 379673 bytes).
+Output written on finalReport.pdf (8 pages, 380204 bytes).
 PDF statistics:
- 307 PDF objects out of 1000 (max. 8388607)
- 239 compressed objects within 3 object streams
- 52 named destinations out of 1000 (max. 500000)
+ 310 PDF objects out of 1000 (max. 8388607)
+ 242 compressed objects within 3 object streams
+ 53 named destinations out of 1000 (max. 500000)
  81 words of extra memory for PDF output out of 10000 (max. 10000000)
 

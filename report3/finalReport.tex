@@ -421,6 +421,9 @@ One can see easily that the overlap of the predictions and the ground truth give
 \section{Conclusion}
 There are several possible ways of using min-cost flows for tracking objects in videos. Such an optimisation problem looks at the whole video at once and does not propagate the position of the object iteratively through the video. This way information about the location of the object in different frames can be used in a unified manner. An issue with using MCFPs for object tracking is the large resulting problem size, which can make directly solving the linear problem or even differentiating through it prohibitively expensive. Another problem is the non-continuous change of an optimal flow with respect to the costs. Both the long computation time and the poor differentiability could potentially be mitigated by regularising the linear problem. Thus, it would be interesting to pursue and implement the ideas of section \ref{Sinkhorn} and to explore possbilities of transferring the ideas of \cite{sch17} to our case.
 
+\section*{Acknowledgements}
+We thank Sven Peter for tutoring the lecture Machine Learning for Computer Vision and approval of our project proposal. Moreover, we are thankful to Lorenzo Cerrone for his feedback and the pointer to the network architecture in \cite{Lee17}. Finally, we want to thank Prof. Hamprecht for allowing for a more theoretical project and many valuable suggestions including the two main ideas that we explored.
+
 \bibliography{tracking.bib}
 \bibliographystyle{icml2017}
 
